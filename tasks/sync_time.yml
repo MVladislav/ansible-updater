@@ -1,0 +1,17 @@
+---
+# tasks file for ./roles/updater
+
+# ------------------------------------------------------------------------------
+- name: "updater - sync time step 1 - disable timedatectl ntp [set-ntp off]"
+  become: yes
+  command: "timedatectl set-ntp off"
+  tags:
+    - updater
+    - sync_time
+
+- name: "updater - sync time step 2 - activate timedatectl ntp [set-ntp on]"
+  become: yes
+  command: "timedatectl set-ntp on"
+  tags:
+    - updater
+    - sync_time

@@ -1,0 +1,39 @@
+---
+# tasks file for ./roles/updater
+
+# ------------------------------------------------------------------------------
+- name: "updater - ensure /etc/timezone contains {{ updater_time_timezone }}"
+  become: true
+  lineinfile:
+    name: /etc/timezone
+    line: "{{ updater_time_timezone }}"
+    state: present
+  check_mode: yes
+  register: checktimezone
+  tags:
+    - updater
+    - timezone
+
+- name: "updater - remove /etc/localtime"
+  become: true
+  file:
+    path: "/etc/localtime"
+    state: absent
+  when: checktimezone.changed
+  tags:
+    - updater
+    - timezone
+
+- name: "updater - update /etc/timezone with {{ updater_time_timezone }}"
+  become: yes
+  copy:
+    content: "{{ updater_time_timezone }}"
+    dest: "/etc/timezone"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: reconfigure tzdata
+  when: checktimezone.changed
+  tags:
+    - updater
+    - timezone

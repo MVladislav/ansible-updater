@@ -1,0 +1,50 @@
+---
+# defaults file for ./roles/updater
+
+# ------------------------------------------------------------------------------
+updater_config:
+  set_timezone: yes
+  sync_time: yes
+  set_language: yes
+  update_upgrade: yes
+
+# ------------------------------------------------------------------------------
+updater_time_timezone: Europe/Berlin
+
+# ------------------------------------------------------------------------------
+updater_language_default_pack: en
+
+updater_config_system_locale: en_US.UTF-8
+updater_config_system_language: en_US.UTF-8
+#
+# TODO: [cod] ex.: de | en | ...
+# TODO: sudo apt-get install language-pack-[cod] language-pack-gnome-[cod] language-pack-[cod]-base language-pack-gnome-[cod]-base
+# TODO: check-language-support -l [cod]
+# TODO: sudo apt-get -y install `check-language-support -l [cod]`
+#
+# LANGUAGE:
+# LC_ALL:
+# LC_TIME: "{{ config_system_locale }}"
+# LC_MONETARY: "{{ config_system_locale }}"
+# LC_ADDRESS: "{{ config_system_locale }}"
+# LC_TELEPHONE: "{{ config_system_locale }}"
+# LC_NAME: "{{ config_system_locale }}"
+# LC_MEASUREMENT: "{{ config_system_locale }}"
+# LC_IDENTIFICATION: "{{ config_system_locale }}"
+# LC_NUMERIC: "{{ config_system_language }}"
+# LC_PAPER: "{{ config_system_locale }}"
+# LANG: "{{ config_system_language }}"
+
+# languages:
+#   - "{{ LC_TIME }}"
+#   - "{{ LC_MONETARY }}"
+#   - "{{ LC_ADDRESS }}"
+#   - "{{ LC_TELEPHONE }}"
+#   - "{{ LC_NAME }}"
+#   - "{{ LC_MEASUREMENT }}"
+#   - "{{ LC_IDENTIFICATION }}"
+#   - "{{ LC_NUMERIC }}"
+#   - "{{ LC_PAPER }}"
+#   - "{{ LANG }}"
+#   - "{{ LANGUAGE }}"
+#   - "{{ LC_ALL }}"
