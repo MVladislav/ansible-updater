@@ -16,6 +16,23 @@
 # - name: "update locale"
 #   become: yes
 #   command: "update-locale LANGUAGE={{ LANGUAGE }} LC_ALL={{ LC_ALL }} LC_TIME={{ LC_TIME }} LC_MONETARY={{ LC_MONETARY }} LC_ADDRESS={{ LC_ADDRESS }} LC_TELEPHONE={{ LC_TELEPHONE }} LC_NAME={{ LC_NAME }} LC_MEASUREMENT={{ LC_MEASUREMENT }} LC_IDENTIFICATION={{ LC_IDENTIFICATION }} LC_NUMERIC={{ LC_NUMERIC }} LC_PAPER={{ LC_PAPER }} LANG={{ LANG }}"
+
+# ------------------------------------------------------------------------------
+# ENV
+- name: set env variables
+  become: yes
+  lineinfile:
+    dest: "/etc/environment"
+    state: present
+    regexp: "^{{ item.key }}="
+    line: "{{ item.key }}={{ item.value}}"
+  with_items:
+    - key: LC_ALL
+      value: "{{ updater_config_system_locale }}"
+  tags:
+    - updater
+    - system_local
+
 #   tags: updater
 #
 # ------------------------------------------------------------------------------
