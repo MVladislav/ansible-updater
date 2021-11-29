@@ -2,6 +2,13 @@
 # defaults file for ./roles/updater
 
 # ------------------------------------------------------------------------------
+# CLIENTS for adding specific languages
+clients:
+  - name: "{{ ansible_user }}"
+    locale: en_US.UTF-8
+    language: en_US.UTF-8
+
+# ------------------------------------------------------------------------------
 updater_config:
   set_timezone: yes
   sync_time: yes

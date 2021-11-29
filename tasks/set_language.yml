@@ -19,7 +19,7 @@
 
 # ------------------------------------------------------------------------------
 # ENV
-- name: set language env variables
+- name: updater - set language env variables
   become: yes
   lineinfile:
     dest: "/etc/default/locale"
@@ -35,10 +35,32 @@
     - updater
     - system_local
 
-#   tags: updater
-#
 # ------------------------------------------------------------------------------
-- name: "updater - ensure localisation files for {{ updater_config_system_locale }} are available"
+- name: "updater - ensure language packages are installed for 'language-pack-{{ updater_config_system_locale.split('_')[0] }}' and 'language-pack-{{ updater_config_system_locale.split('_')[0] }}-base'"
+  become: yes
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+    update_cache: true
+  with_items:
+    - "language-pack-{{ updater_config_system_locale.split('_')[0] }}"
+    - "language-pack-{{ updater_config_system_locale.split('_')[0] }}-base"
+  register: locale_languages
+  when: outer_item.locale is defined
+  tags:
+    - updater
+    - system_local
+
+- name: updater - ensure dpkg is reconfigured
+  become: yes
+  command: dpkg-reconfigure locales -f noninteractive
+  when: locale_languages is defined and locale_languages.changed
+  tags:
+    - updater
+    - system_local
+
+# ------------------------------------------------------------------------------
+- name: "updater - ensure localization files for {{ updater_config_system_locale }} are available"
   become: yes
   locale_gen:
     name: "{{ updater_config_system_locale }}"
@@ -56,6 +78,7 @@
     - updater
     - system_local
 
+# ------------------------------------------------------------------------------
 - name: updater - get current locale and language configuration
   become: yes
   command: localectl status
@@ -66,6 +89,7 @@
     - system_local
 
 - name: updater - parse 'LANG' from current locale and language configuration
+  become: yes
   set_fact:
     locale_lang: "{{ locale_status.stdout | regex_search('LANG=([^\n]+)', '\\1') | first }}"
   when: locale_status is defined and locale_status.stdout is defined
@@ -73,7 +97,9 @@
     - updater
     - system_local
 
+# ------------------------------------------------------------------------------
 - name: updater - parse 'LANGUAGE' from current locale and language configuration
+  become: yes
   set_fact:
     locale_language: "{{ locale_status.stdout | regex_search('LANGUAGE=([^\n]+)', '\\1') | default([locale_lang], true) | first }}"
   when: locale_status is defined and locale_status.stdout is defined

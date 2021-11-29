@@ -16,6 +16,13 @@
   include: set_language.yml
   when: updater_config.set_language is defined and updater_config.set_language | bool
 
+- name: set language per user
+  include: set_language_user.yml
+  loop: "{{ clients | flatten(levels=1) }}"
+  loop_control:
+    loop_var: outer_item
+  when: (clients is defined and (outer_item.locale is defined or outer_item.language is defined)) and (updater_config.set_language is defined and updater_config.set_language | bool)
+
 # ------------------------------------------------------------------------------
 - name: updater - update repositories
   become: yes
