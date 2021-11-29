@@ -24,16 +24,16 @@ updater_config_system_language: en_US.UTF-8
 #
 # LANGUAGE:
 # LC_ALL:
-# LC_TIME: "{{ config_system_locale }}"
-# LC_MONETARY: "{{ config_system_locale }}"
-# LC_ADDRESS: "{{ config_system_locale }}"
-# LC_TELEPHONE: "{{ config_system_locale }}"
-# LC_NAME: "{{ config_system_locale }}"
-# LC_MEASUREMENT: "{{ config_system_locale }}"
-# LC_IDENTIFICATION: "{{ config_system_locale }}"
-# LC_NUMERIC: "{{ config_system_language }}"
-# LC_PAPER: "{{ config_system_locale }}"
-# LANG: "{{ config_system_language }}"
+# LC_TIME: "{{ updater_config_system_locale }}"
+# LC_MONETARY: "{{ updater_config_system_locale }}"
+# LC_ADDRESS: "{{ updater_config_system_locale }}"
+# LC_TELEPHONE: "{{ updater_config_system_locale }}"
+# LC_NAME: "{{ updater_config_system_locale }}"
+# LC_MEASUREMENT: "{{ updater_config_system_locale }}"
+# LC_IDENTIFICATION: "{{ updater_config_system_locale }}"
+# LC_NUMERIC: "{{ updater_config_system_language }}"
+# LC_PAPER: "{{ updater_config_system_locale }}"
+# LANG: "{{ updater_config_system_language }}"
 
 # languages:
 #   - "{{ LC_TIME }}"

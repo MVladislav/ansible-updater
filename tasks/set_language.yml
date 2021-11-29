@@ -19,10 +19,10 @@
 
 # ------------------------------------------------------------------------------
 # ENV
-- name: set env variables
+- name: set language env variables
   become: yes
   lineinfile:
-    dest: "/etc/environment"
+    dest: "/etc/default/locale"
     state: present
     regexp: "^{{ item.key }}="
     line: "{{ item.key }}={{ item.value}}"
