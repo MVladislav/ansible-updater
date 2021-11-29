@@ -29,6 +29,8 @@
   with_items:
     - key: LC_ALL
       value: "{{ updater_config_system_locale }}"
+    - key: LC_CTYPE
+      value: C.UTF-8
   tags:
     - updater
     - system_local
