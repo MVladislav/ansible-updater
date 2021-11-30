@@ -54,7 +54,7 @@
 - name: "updater - get current locale and language configuration (for user {{ outer_item }})"
   become: yes
   become_user: "{{ outer_item.name }}"
-  command: localectl status
+  command: locale
   register: locale_status
   changed_when: false
   tags:
@@ -198,6 +198,16 @@
       value: "{{ outer_item.locale }}"
     - key: PAPERSIZE
       value: "a4"
+  tags:
+    - updater
+    - system_local
+    - system_local_user
+
+- name: "updater - remove conf file for user-dirs.*"
+  become: yes
+  become_user: "{{ outer_item.name }}"
+  shell: rm ~/.config/user-dirs.{dirs,locale}
+  when: locale_lang != outer_item.locale or locale_language != outer_item.language
   tags:
     - updater
     - system_local
