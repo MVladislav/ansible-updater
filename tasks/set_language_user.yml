@@ -203,10 +203,10 @@
     - system_local
     - system_local_user
 
-- name: "updater - remove conf file for user-dirs.*"
+- name: "updater - remove conf file for user-dirs.* and recreate"
   become: yes
   become_user: "{{ outer_item.name }}"
-  shell: rm ~/.config/user-dirs.{dirs,locale}
+  shell: rm ~/.config/user-dirs.{dirs,locale} ; xdg-user-dirs-update --force
   when: locale_lang != outer_item.locale or locale_language != outer_item.language
   tags:
     - updater
