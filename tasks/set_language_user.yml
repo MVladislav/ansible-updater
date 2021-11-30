@@ -12,7 +12,7 @@
     - "language-pack-{{ outer_item.locale.split('_')[0] }}"
     - "language-pack-{{ outer_item.locale.split('_')[0] }}-base"
     - "language-pack-gnome-{{ outer_item.locale.split('_')[0] }}"
-    - "language-pack-gnome-{{ outer_item.locale.split('_')[0]-base }}"
+    - "language-pack-gnome-{{ outer_item.locale.split('_')[0] }}-base"
   register: locale_languages
   when: outer_item.locale is defined
   tags:
