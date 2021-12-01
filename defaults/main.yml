@@ -8,6 +8,9 @@ clients:
     locale: en_US.UTF-8
     language: en_US.UTF-8
 
+updater_dependencies:
+  - systemd-timesyncd
+
 # ------------------------------------------------------------------------------
 updater_config:
   set_timezone: yes

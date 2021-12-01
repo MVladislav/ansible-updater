@@ -1,6 +1,7 @@
 ---
 # tasks file for ./roles/updater
 
+# ------------------------------------------------------------------------------
 # SET TIMEZONE
 - name: set timezone
   include: set_timezone.yml
@@ -46,3 +47,49 @@
   tags:
     - updater
     - upgrade
+
+# ------------------------------------------------------------------------------
+- name: updater - install dependencies
+  become: yes
+  ansible.builtin.apt:
+    pkg: "{{ item }}"
+    state: present
+    force_apt_get: yes # apt-get instead of aptitude
+  loop: "{{ updater_dependencies|flatten(levels=1) }}"
+  when: updater_config.set_timezone is defined and updater_config.set_timezone | bool
+  tags:
+    - updater
+    - dependencies
+
+# ------------------------------------------------------------------------------
+- name: "updater - add /etc/systemd/timesyncd.conf"
+  become: yes
+  ansible.builtin.copy:
+    dest: /etc/systemd/timesyncd.conf
+    content: |
+      #  This file is part of systemd.
+      #
+      #  systemd is free software; you can redistribute it and/or modify it
+      #  under the terms of the GNU Lesser General Public License as published by
+      #  the Free Software Foundation; either version 2.1 of the License, or
+      #  (at your option) any later version.
+      #
+      # Entries in this file show the compile time defaults.
+      # You can change settings by editing this file.
+      # Defaults can be restored by simply deleting this file.
+      #
+      # See timesyncd.conf(5) for details.
+
+      [Time]
+      NTP=time.cloudflare.com
+      FallbackNTP=ntp.ubuntu.com
+      #NTP=0.de.pool.ntp.org 1.de.pool.ntp.org 2.de.pool.ntp.org
+      #FallbackNTP=0.arch.pool.ntp.org 1.arch.pool.ntp.org 2.arch.pool.ntp.org 3.arch.pool.ntp.org
+      #RootDistanceMaxSec=5
+      #PollIntervalMinSec=32
+      #PollIntervalMaxSec=2048
+  notify:
+    - restart systemd-timesyncd
+  tags:
+    - updater
+    - timesyncd
