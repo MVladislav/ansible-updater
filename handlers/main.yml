@@ -4,11 +4,3 @@
 - name: reconfigure tzdata
   become: yes
   shell: dpkg-reconfigure -f noninteractive tzdata
-
-- name: restart systemd-timesyncd
-  become: true
-  service:
-    name: systemd-timesyncd
-    state: restarted
-    enabled: yes
-  listen: restart systemd-timesyncd

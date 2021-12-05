@@ -88,8 +88,15 @@
       #RootDistanceMaxSec=5
       #PollIntervalMinSec=32
       #PollIntervalMaxSec=2048
-  notify:
-    - restart systemd-timesyncd
+  register: systemd_timesyncd
   tags:
     - updater
     - timesyncd
+
+- name: restart systemd-timesyncd
+  become: true
+  service:
+    name: systemd-timesyncd
+    state: restarted
+    enabled: yes
+  when: systemd_timesyncd is defined and (systemd_timesyncd.changed is defined and systemd_timesyncd.changed | bool)
