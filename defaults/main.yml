@@ -17,6 +17,7 @@ updater_config:
   sync_time: yes
   set_language: yes
   update_upgrade: yes
+  setup_zfs: no
 
 # ------------------------------------------------------------------------------
 updater_time_timezone: Europe/Berlin

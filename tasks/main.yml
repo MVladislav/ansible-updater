@@ -100,3 +100,9 @@
     state: restarted
     enabled: yes
   when: systemd_timesyncd is defined and (systemd_timesyncd.changed is defined and systemd_timesyncd.changed | bool)
+
+# ------------------------------------------------------------------------------
+# SETUP TFS
+- name: setup zfs
+  include: setup_zfs.yml
+  when: updater_config.setup_zfs is defined and updater_config.setup_zfs | bool
