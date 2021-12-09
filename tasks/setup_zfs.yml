@@ -6,8 +6,8 @@
   copy:
     dest: /etc/modprobe.d/zfs.conf
     content: |
-      options zfs zfs_arc_min={{(ansible_memory_mb.real.total/4)*1024*1024}}
-      options zfs zfs_arc_max={{(ansible_memory_mb.real.total/2)*1024*1024}}
+      options zfs zfs_arc_min={{(ansible_memory_mb.real.total/4)*1024*1024|int}}
+      options zfs zfs_arc_max={{(ansible_memory_mb.real.total/2)*1024*1024|int}}
   register: zfs_changes
   when: (ansible_memory_mb is defined and ansible_memory_mb.real is defined and ansible_memory_mb.real.total is defined)
   tags:
