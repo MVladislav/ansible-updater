@@ -45,6 +45,8 @@
   with_items:
     - "language-pack-{{ updater_config_system_locale.split('_')[0] }}"
     - "language-pack-{{ updater_config_system_locale.split('_')[0] }}-base"
+    - "language-pack-gnome-{{ updater_config_system_locale.split('_')[0] }}"
+    - "language-pack-gnome-{{ updater_config_system_locale.split('_')[0] }}-base"
   register: locale_languages
   when: outer_item.locale is defined
   tags:
