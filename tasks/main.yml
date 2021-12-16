@@ -2,6 +2,19 @@
 # tasks file for ./roles/updater
 
 # ------------------------------------------------------------------------------
+- name: updater - install dependencies
+  become: yes
+  ansible.builtin.apt:
+    pkg: "{{ item }}"
+    state: present
+    force_apt_get: yes # apt-get instead of aptitude
+  loop: "{{ updater_dependencies|flatten(levels=1) }}"
+  when: updater_config.set_timezone is defined and updater_config.set_timezone | bool
+  tags:
+    - updater
+    - dependencies
+
+# ------------------------------------------------------------------------------
 # SET TIMEZONE
 - name: set timezone
   include: set_timezone.yml
@@ -47,19 +60,6 @@
   tags:
     - updater
     - upgrade
-
-# ------------------------------------------------------------------------------
-- name: updater - install dependencies
-  become: yes
-  ansible.builtin.apt:
-    pkg: "{{ item }}"
-    state: present
-    force_apt_get: yes # apt-get instead of aptitude
-  loop: "{{ updater_dependencies|flatten(levels=1) }}"
-  when: updater_config.set_timezone is defined and updater_config.set_timezone | bool
-  tags:
-    - updater
-    - dependencies
 
 # ------------------------------------------------------------------------------
 - name: "updater - add /etc/systemd/timesyncd.conf"
