@@ -10,6 +10,7 @@ clients:
 
 updater_dependencies:
   - systemd-timesyncd
+  - locales
 
 # ------------------------------------------------------------------------------
 updater_config:
