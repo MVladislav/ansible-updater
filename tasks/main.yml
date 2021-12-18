@@ -81,8 +81,8 @@
       # See timesyncd.conf(5) for details.
 
       [Time]
-      NTP=time.cloudflare.com
-      FallbackNTP=ntp.ubuntu.com
+      NTP={{ updater_ntp_server }}
+      FallbackNTP={{ updater_ntp_fallback_server }}
       #NTP=0.de.pool.ntp.org 1.de.pool.ntp.org 2.de.pool.ntp.org
       #FallbackNTP=0.arch.pool.ntp.org 1.arch.pool.ntp.org 2.arch.pool.ntp.org 3.arch.pool.ntp.org
       #RootDistanceMaxSec=5
@@ -102,7 +102,7 @@
   when: systemd_timesyncd is defined and (systemd_timesyncd.changed is defined and systemd_timesyncd.changed | bool)
 
 # ------------------------------------------------------------------------------
-# SETUP TFS
+# SETUP ZFS
 - name: setup zfs
   include: setup_zfs.yml
   when: updater_config.setup_zfs is defined and updater_config.setup_zfs | bool
