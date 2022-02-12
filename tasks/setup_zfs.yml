@@ -14,8 +14,8 @@
   copy:
     dest: /etc/modprobe.d/zfs.conf
     content: |
-      options zfs zfs_arc_min={{ ((node_memory_size.stdout/4)*1024*1024)|round|int }}
-      options zfs zfs_arc_max={{ ((node_memory_size.stdout/2)*1024*1024)|round|int }}
+      options zfs zfs_arc_min={{ ((node_memory_size.stdout|int/4)*1024*1024)|round|int }}
+      options zfs zfs_arc_max={{ ((node_memory_size.stdout|int/2)*1024*1024)|round|int }}
   register: zfs_changes
   when: (node_memory_size is defined and node_memory_size.stdout is defined)
   tags:
