@@ -2,7 +2,7 @@
 # tasks file for ./roles/updater
 
 - name: "updater - creating and setup /etc/modprobe.d/zfs.conf"
-  become: yes
+  become: true
   shell: grep MemTotal /proc/meminfo | awk '{print $2}'
   register: node_memory_size
   tags:
@@ -10,7 +10,7 @@
     - zfs
 
 - name: "updater - creating and setup /etc/modprobe.d/zfs.conf"
-  become: yes
+  become: true
   copy:
     dest: /etc/modprobe.d/zfs.conf
     content: |
@@ -23,7 +23,7 @@
     - zfs
 
 - name: "updater - re-init zfs changes"
-  become: yes
+  become: true
   command: update-initramfs -u
   when: (zfs_changes is defined and zfs_changes.changed is defined and zfs_changes.changed|bool)
   tags:

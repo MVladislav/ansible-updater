@@ -3,14 +3,14 @@
 
 # ------------------------------------------------------------------------------
 - name: "updater - sync time step 1 - disable timedatectl ntp [set-ntp off]"
-  become: yes
+  become: true
   command: "timedatectl set-ntp off"
   tags:
     - updater
     - sync_time
 
 - name: "updater - sync time step 2 - activate timedatectl ntp [set-ntp on]"
-  become: yes
+  become: true
   command: "timedatectl set-ntp on"
   tags:
     - updater

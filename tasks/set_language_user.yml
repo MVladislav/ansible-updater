@@ -3,7 +3,7 @@
 
 # ------------------------------------------------------------------------------
 - name: "updater - ensure language packages are installed for 'language-pack-{{ outer_item.locale.split('_')[0] }}' and 'language-pack-{{ outer_item.locale.split('_')[0] }}-base' (for user {{ outer_item }})"
-  become: yes
+  become: true
   apt:
     pkg: "{{ item }}"
     state: latest
@@ -21,7 +21,7 @@
     - system_local_user
 
 - name: "updater - ensure dpkg is reconfigured (for user {{ outer_item }})"
-  become: yes
+  become: true
   command: dpkg-reconfigure locales -f noninteractive
   when: locale_languages is defined and locale_languages.changed
   tags:
@@ -31,7 +31,7 @@
 
 # ------------------------------------------------------------------------------
 - name: "updater - ensure localization files for {{ outer_item.locale }} are available (for user {{ outer_item }})"
-  become: yes
+  become: true
   locale_gen:
     name: "{{ outer_item.locale }}"
     state: present
@@ -41,7 +41,7 @@
     - system_local_user
 
 - name: "updater - ensure localization files for {{ outer_item.language }} are available (for user {{ outer_item }})"
-  become: yes
+  become: true
   locale_gen:
     name: "{{ outer_item.language }}"
     state: present
@@ -52,7 +52,7 @@
 
 # ------------------------------------------------------------------------------
 - name: "updater - get current locale and language configuration (for user {{ outer_item }})"
-  become: yes
+  become: true
   become_user: "{{ outer_item.name }}"
   command: locale
   register: locale_status
@@ -63,7 +63,7 @@
     - system_local_user
 
 - name: "updater - parse 'LANG' from current locale and language configuration (for user {{ outer_item }})"
-  become: yes
+  become: true
   become_user: "{{ outer_item.name }}"
   set_fact:
     locale_lang: "{{ locale_status.stdout | regex_search('LANG=([^\n]+)', '\\1') | first }}"
@@ -74,7 +74,7 @@
     - system_local_user
 
 - name: "updater - parse 'LANGUAGE' from current locale and language configuration (for user {{ outer_item }})"
-  become: yes
+  become: true
   become_user: "{{ outer_item.name }}"
   set_fact:
     locale_language: "{{ locale_status.stdout | regex_search('LANGUAGE=([^\n]+)', '\\1') | default([locale_lang], true) | first }}"
@@ -86,7 +86,7 @@
 
     # # ------------------------------------------------------------------------------
     # - name: "updater - configure locale to {{ outer_item.locale }} (for user {{ outer_item }})"
-    #   become: yes
+    #   become: true
     #   become_user: "{{ outer_item.name }}"
     #   command: "localectl set-locale LANG={{ outer_item.locale }}"
     #   changed_when: locale_lang != outer_item.locale
@@ -97,7 +97,7 @@
     #      - system_local_user
 
     # - name: "updater - configure language to {{ outer_item.language }} (for user {{ outer_item }})"
-    #   become: yes
+    #   become: true
     #   become_user: "{{ outer_item.name }}"
     #   command: "localectl set-locale LANGUAGE={{ outer_item.language }}"
     #   changed_when: locale_language != outer_item.language
@@ -109,7 +109,7 @@
 
 # ------------------------------------------------------------------------------
 - name: "updater - ensure file '~/.pam_environment' exists (for user {{ outer_item }})"
-  become: yes
+  become: true
   become_user: "{{ outer_item.name }}"
   copy:
     content: ""
@@ -120,7 +120,7 @@
     mode: 0660
 
 - name: "updater - set language env variables in '~/.pam_environment' (for user {{ outer_item }})"
-  become: yes
+  become: true
   become_user: "{{ outer_item.name }}"
   lineinfile:
     dest: "~/.pam_environment"
@@ -162,7 +162,7 @@
     - system_local_user
 
 - name: "updater - set language env variables in '~/.profile' (for user {{ outer_item }})"
-  become: yes
+  become: true
   become_user: "{{ outer_item.name }}"
   lineinfile:
     dest: "~/.profile"
@@ -204,7 +204,7 @@
     - system_local_user
 
 - name: "updater - remove conf file for user-dirs.* and recreate"
-  become: yes
+  become: true
   become_user: "{{ outer_item.name }}"
   shell: rm ~/.config/user-dirs.{dirs,locale} ; xdg-user-dirs-update --force
   when: locale_lang != outer_item.locale or locale_language != outer_item.language
@@ -215,7 +215,7 @@
 
 # ------------------------------------------------------------------------------
 - name: "updater - ensure dpkg is reconfigured (for user {{ outer_item }})"
-  become: yes
+  become: true
   command: dpkg-reconfigure locales -f noninteractive
   when: locale_lang != outer_item.locale or locale_language != outer_item.language
   tags:

@@ -2,5 +2,5 @@
 # handlers file for ./roles/updater
 
 - name: reconfigure tzdata
-  become: yes
+  become: true
   shell: dpkg-reconfigure -f noninteractive tzdata

@@ -25,7 +25,7 @@
     - timezone
 
 - name: "updater - update /etc/timezone with {{ updater_time_timezone }}"
-  become: yes
+  become: true
   copy:
     content: "{{ updater_time_timezone }}"
     dest: "/etc/timezone"

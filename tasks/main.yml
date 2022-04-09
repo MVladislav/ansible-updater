@@ -3,7 +3,7 @@
 
 # ------------------------------------------------------------------------------
 - name: updater - install dependencies
-  become: yes
+  become: true
   ansible.builtin.apt:
     pkg: "{{ item }}"
     state: present
@@ -39,7 +39,7 @@
 
 # ------------------------------------------------------------------------------
 - name: updater - update repositories
-  become: yes
+  become: true
   apt:
     update_cache: yes # equivalent of apt-get update
     force_apt_get: yes # apt-get instead of aptitude
@@ -52,7 +52,7 @@
     - update
 
 - name: updater - upgrade packages
-  become: yes
+  become: true
   apt:
     upgrade: dist # If yes or safe, performs an aptitude safe-upgrade.
     force_apt_get: yes # apt-get instead of aptitude
@@ -63,7 +63,7 @@
 
 # ------------------------------------------------------------------------------
 - name: "updater - add /etc/systemd/timesyncd.conf"
-  become: yes
+  become: true
   ansible.builtin.copy:
     dest: /etc/systemd/timesyncd.conf
     content: |
