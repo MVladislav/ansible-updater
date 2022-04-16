@@ -15,17 +15,30 @@
 
 # - name: "update locale"
 #   become: true
-#   command: "update-locale LANGUAGE={{ LANGUAGE }} LC_ALL={{ LC_ALL }} LC_TIME={{ LC_TIME }} LC_MONETARY={{ LC_MONETARY }} LC_ADDRESS={{ LC_ADDRESS }} LC_TELEPHONE={{ LC_TELEPHONE }} LC_NAME={{ LC_NAME }} LC_MEASUREMENT={{ LC_MEASUREMENT }} LC_IDENTIFICATION={{ LC_IDENTIFICATION }} LC_NUMERIC={{ LC_NUMERIC }} LC_PAPER={{ LC_PAPER }} LANG={{ LANG }}"
+#   command: >
+#     update-locale
+#     LANGUAGE={{ LANGUAGE }}
+#     LC_ALL={{ LC_ALL }}
+#     LC_TIME={{ LC_TIME }}
+#     LC_MONETARY={{ LC_MONETARY }}
+#     LC_ADDRESS={{ LC_ADDRESS }}
+#     LC_TELEPHONE={{ LC_TELEPHONE }}
+#     LC_NAME={{ LC_NAME }}
+#     LC_MEASUREMENT={{ LC_MEASUREMENT }}
+#     LC_IDENTIFICATION={{ LC_IDENTIFICATION }}
+#     LC_NUMERIC={{ LC_NUMERIC }}
+#     LC_PAPER={{ LC_PAPER }}
+#     LANG={{ LANG }}
 
 # ------------------------------------------------------------------------------
 # ENV
 - name: updater - set language env variables
   become: true
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "/etc/default/locale"
     state: present
     regexp: "^{{ item.key }}="
-    line: "{{ item.key }}={{ item.value}}"
+    line: "{{ item.key }}={{ item.value }}"
   with_items:
     - key: LC_ALL
       value: "{{ updater_config_system_locale }}"
@@ -36,11 +49,14 @@
     - system_local
 
 # ------------------------------------------------------------------------------
-- name: "updater - ensure language packages are installed for 'language-pack-{{ updater_config_system_locale.split('_')[0] }}' and 'language-pack-{{ updater_config_system_locale.split('_')[0] }}-base'"
+- name: >
+    updater - ensure language packages are installed for
+    'language-pack-{{ updater_config_system_locale.split('_')[0] }}'
+    and 'language-pack-{{ updater_config_system_locale.split('_')[0] }}-base'
   become: true
-  apt:
+  ansible.builtin.apt:
     pkg: "{{ item }}"
-    state: latest
+    state: present
     update_cache: true
   with_items:
     - "language-pack-{{ updater_config_system_locale.split('_')[0] }}"
@@ -55,7 +71,7 @@
 
 - name: updater - ensure dpkg is reconfigured
   become: true
-  command: dpkg-reconfigure locales -f noninteractive
+  ansible.builtin.command: dpkg-reconfigure locales -f noninteractive
   when: locale_languages is defined and locale_languages.changed
   tags:
     - updater
@@ -83,7 +99,7 @@
 # ------------------------------------------------------------------------------
 - name: updater - get current locale and language configuration
   become: true
-  command: localectl status
+  ansible.builtin.command: localectl status
   register: locale_status
   changed_when: false
   tags:
@@ -92,7 +108,7 @@
 
 - name: updater - parse 'LANG' from current locale and language configuration
   become: true
-  set_fact:
+  ansible.builtin.set_fact:
     locale_lang: "{{ locale_status.stdout | regex_search('LANG=([^\n]+)', '\\1') | first }}"
   when: locale_status is defined and locale_status.stdout is defined
   tags:
@@ -102,7 +118,7 @@
 # ------------------------------------------------------------------------------
 - name: updater - parse 'LANGUAGE' from current locale and language configuration
   become: true
-  set_fact:
+  ansible.builtin.set_fact:
     locale_language: "{{ locale_status.stdout | regex_search('LANGUAGE=([^\n]+)', '\\1') | default([locale_lang], true) | first }}"
   when: locale_status is defined and locale_status.stdout is defined
   tags:
@@ -111,7 +127,7 @@
 
 - name: "updater - configure locale to {{ updater_config_system_locale }} and language to {{ updater_config_system_language }}"
   become: true
-  command: "localectl set-locale LANG={{ updater_config_system_locale }} LANGUAGE={{ updater_config_system_language }}"
+  ansible.builtin.command: "localectl set-locale LANG={{ updater_config_system_locale }} LANGUAGE={{ updater_config_system_language }}"
   changed_when: locale_lang != updater_config_system_locale or locale_language != updater_config_system_language
   tags:
     - updater

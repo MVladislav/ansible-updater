@@ -7,7 +7,7 @@
   ansible.builtin.apt:
     pkg: "{{ item }}"
     state: present
-    force_apt_get: yes # apt-get instead of aptitude
+    force_apt_get: true # apt-get instead of aptitude
   loop: "{{ updater_dependencies|flatten(levels=1) }}"
   when: updater_config.set_timezone is defined and updater_config.set_timezone | bool
   tags:
@@ -35,17 +35,19 @@
   loop: "{{ clients | flatten(levels=1) }}"
   loop_control:
     loop_var: outer_item
-  when: (clients is defined and (outer_item.locale is defined or outer_item.language is defined)) and (updater_config.set_language is defined and updater_config.set_language | bool)
+  when: >
+    (clients is defined and (outer_item.locale is defined or outer_item.language is defined))
+    and (updater_config.set_language is defined and updater_config.set_language | bool)
 
 # ------------------------------------------------------------------------------
 - name: updater - update repositories
   become: true
-  apt:
-    update_cache: yes # equivalent of apt-get update
-    force_apt_get: yes # apt-get instead of aptitude
+  ansible.builtin.apt:
+    update_cache: true # equivalent of apt-get update
+    force_apt_get: true # apt-get instead of aptitude
     cache_valid_time: 3600
-    autoremove: yes
-    autoclean: yes
+    autoremove: true
+    autoclean: true
   when: updater_config.update_upgrade is defined and updater_config.update_upgrade | bool
   tags:
     - updater
@@ -53,9 +55,9 @@
 
 - name: updater - upgrade packages
   become: true
-  apt:
+  ansible.builtin.apt:
     upgrade: dist # If yes or safe, performs an aptitude safe-upgrade.
-    force_apt_get: yes # apt-get instead of aptitude
+    force_apt_get: true # apt-get instead of aptitude
   when: updater_config.update_upgrade is defined and updater_config.update_upgrade | bool
   tags:
     - updater
@@ -98,7 +100,7 @@
 #   service:
 #     name: systemd-timesyncd
 #     state: restarted
-#     enabled: yes
+#     enabled: true
 #   when: systemd_timesyncd is defined and (systemd_timesyncd.changed is defined and systemd_timesyncd.changed | bool)
 
 # ------------------------------------------------------------------------------
@@ -107,6 +109,7 @@
   become: true
   ansible.builtin.copy:
     dest: /etc/chrony/chrony.conf
+    mode: 0644
     content: |
       # This the default chrony.conf file for the Debian chrony package.  After
       # editing this file use the command 'invoke-rc.d chrony restart' to make
@@ -212,10 +215,10 @@
 
 - name: restart chrony
   become: true
-  service:
+  ansible.builtin.service:
     name: chrony
     state: restarted
-    enabled: yes
+    enabled: true
   when: systemd_chrony is defined and (systemd_chrony.changed is defined and systemd_chrony.changed | bool)
 
 # ------------------------------------------------------------------------------

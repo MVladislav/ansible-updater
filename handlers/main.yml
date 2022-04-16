@@ -3,4 +3,4 @@
 
 - name: reconfigure tzdata
   become: true
-  shell: dpkg-reconfigure -f noninteractive tzdata
+  ansible.builtin.command: dpkg-reconfigure -f noninteractive tzdata

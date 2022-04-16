@@ -3,19 +3,21 @@
 
 - name: "updater - creating and setup /etc/modprobe.d/zfs.conf"
   become: true
-  shell: grep MemTotal /proc/meminfo | awk '{print $2}'
+  ansible.builtin.command: grep MemTotal /proc/meminfo | awk '{print $2}'
   register: node_memory_size
+  changed_when: timedatectl_off_output.rc != 0
   tags:
     - updater
     - zfs
 
 - name: "updater - creating and setup /etc/modprobe.d/zfs.conf"
   become: true
-  copy:
+  ansible.builtin.copy:
     dest: /etc/modprobe.d/zfs.conf
     content: |
       options zfs zfs_arc_min={{ ((node_memory_size.stdout|int/4))|round|int }}
       options zfs zfs_arc_max={{ ((node_memory_size.stdout|int/2))|round|int }}
+    mode: 0644
   register: zfs_changes
   when: (node_memory_size is defined and node_memory_size.stdout is defined)
   tags:
@@ -24,7 +26,7 @@
 
 - name: "updater - re-init zfs changes"
   become: true
-  command: update-initramfs -u
+  ansible.builtin.command: update-initramfs -u
   when: (zfs_changes is defined and zfs_changes.changed is defined and zfs_changes.changed|bool)
   tags:
     - updater

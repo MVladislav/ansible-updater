@@ -14,11 +14,11 @@ updater_dependencies:
 
 # ------------------------------------------------------------------------------
 updater_config:
-  set_timezone: yes
-  sync_time: yes
-  set_language: yes
-  update_upgrade: yes
-  setup_zfs: no
+  set_timezone: true
+  sync_time: true
+  set_language: true
+  update_upgrade: true
+  setup_zfs: false
 
 # ------------------------------------------------------------------------------
 updater_time_timezone: Europe/Berlin
