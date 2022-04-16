@@ -111,6 +111,8 @@
 - name: "updater - check if service chrony installed"
   become: true
   ansible.builtin.shell: set -o pipefail && command -v chrony >/dev/null 2>&1
+  args:
+    executable: /bin/bash
   register: is_chrony_exist
   ignore_errors: true
   changed_when: is_chrony_exist is defined and is_chrony_exist.rc != 0
