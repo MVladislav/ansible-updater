@@ -5,7 +5,7 @@
   become: true
   ansible.builtin.command: grep MemTotal /proc/meminfo | awk '{print $2}'
   register: node_memory_size
-  changed_when: timedatectl_off_output.rc != 0
+  changed_when: node_memory_size is defined and node_memory_size.rc != 0
   tags:
     - updater
     - zfs
