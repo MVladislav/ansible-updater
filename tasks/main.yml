@@ -2,7 +2,7 @@
 # tasks file for ./roles/updater
 
 # ------------------------------------------------------------------------------
-- name: updater - install dependencies
+- name: "updater - install dependencies"
   become: true
   ansible.builtin.apt:
     pkg: "{{ item }}"
@@ -16,21 +16,21 @@
 
 # ------------------------------------------------------------------------------
 # SET TIMEZONE
-- name: set timezone
+- name: "updater - set timezone"
   include_tasks: set_timezone.yml
   when: updater_config.set_timezone is defined and updater_config.set_timezone | bool
 
 # SYNC TIME
-- name: sync time
+- name: "updater - sync time"
   include_tasks: sync_time.yml
   when: updater_config.sync_time is defined and updater_config.sync_time | bool
 
 # SET LANGUAGE
-- name: set language
+- name: "updater - set language"
   include_tasks: set_language.yml
   when: updater_config.set_language is defined and updater_config.set_language | bool
 
-- name: set language per user
+- name: "updater - set language per user"
   include_tasks: set_language_user.yml
   loop: "{{ clients | flatten(levels=1) }}"
   loop_control:
@@ -40,7 +40,7 @@
     and (updater_config.set_language is defined and updater_config.set_language | bool)
 
 # ------------------------------------------------------------------------------
-- name: updater - update repositories
+- name: "updater - update repositories"
   become: true
   ansible.builtin.apt:
     update_cache: true # equivalent of apt-get update
@@ -229,7 +229,7 @@
     - updater
     - chrony
 
-- name: restart chrony
+- name: "updater - restart chrony"
   become: true
   ansible.builtin.service:
     name: chrony
@@ -242,12 +242,12 @@
 
 # ------------------------------------------------------------------------------
 # SETUP ZFS
-- name: setup zfs
+- name: "updater - setup zfs"
   include_tasks: setup_zfs.yml
   when: updater_config.setup_zfs is defined and updater_config.setup_zfs | bool
 
 # ------------------------------------------------------------------------------
 # SETUP UNATTENDED-UPGRADES
-- name: setup unattended-upgrades
+- name: "updater - setup unattended-upgrades"
   include_tasks: unattended-upgrades.yml
   when: updater_config.setup_unattended is defined and updater_config.setup_unattended | bool
