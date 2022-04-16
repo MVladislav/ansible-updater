@@ -110,10 +110,10 @@
 # CHECK IF SERVICE INSTALLED
 - name: "updater - check if service chrony installed"
   become: true
-  ansible.builtin.shell: command -v chrony >/dev/null 2>&1
+  ansible.builtin.command: command -v chrony >/dev/null 2>&1
   register: is_chrony_exist
   ignore_errors: true
-  changed_when: my_output.rc != 0
+  changed_when: is_chrony_exist is defined and is_chrony_exist.rc != 0
   tags:
     - install_client
     - chrony
