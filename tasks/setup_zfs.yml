@@ -3,7 +3,7 @@
 
 - name: "updater - creating and setup /etc/modprobe.d/zfs.conf"
   become: true
-  ansible.builtin.command: grep MemTotal /proc/meminfo | awk '{print $2}'
+  ansible.builtin.shell: set -o pipefail && grep MemTotal /proc/meminfo | awk '{print $2}'
   register: node_memory_size
   changed_when: node_memory_size is defined and node_memory_size.rc != 0
   tags:
