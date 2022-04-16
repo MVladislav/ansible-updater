@@ -243,3 +243,9 @@
 - name: setup zfs
   include: setup_zfs.yml
   when: updater_config.setup_zfs is defined and updater_config.setup_zfs | bool
+
+# ------------------------------------------------------------------------------
+# SETUP UNATTENDED-UPGRADES
+- name: setup unattended-upgrades
+  include: unattended-upgrades.yml
+  when: updater_config.setup_unattended is defined and updater_config.setup_unattended | bool

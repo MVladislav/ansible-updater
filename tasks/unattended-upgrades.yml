@@ -1,0 +1,49 @@
+---
+# tasks file for ./roles/updater
+# <https://github.com/jnv/ansible-role-unattended-upgrades>
+
+# ------------------------------------------------------------------------------
+- name: "updater - install unattended-upgrades"
+  become: true
+  ansible.builtin.apt:
+    pkg:
+      - unattended-upgrades
+      - powermgmt-base
+    state: present
+    cache_valid_time: "{{ unattended_cache_valid_time }}"
+    update_cache: true
+  tags:
+    - updater
+    - unattended_upgrades
+
+# ------------------------------------------------------------------------------
+- name: "updater - add distribution-specific variables"
+  ansible.builtin.include_vars: "{{ ansible_distribution }}.yml"
+  tags:
+    - updater
+    - unattended_upgrades
+
+# ------------------------------------------------------------------------------
+- name: "updater - create APT auto-upgrades configuration"
+  become: true
+  ansible.builtin.template:
+    src: auto-upgrades.j2
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - updater
+    - unattended_upgrades
+
+- name: "updater - create unattended-upgrades configuration"
+  become: true
+  ansible.builtin.template:
+    src: unattended-upgrades.j2
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - updater
+    - unattended_upgrades
