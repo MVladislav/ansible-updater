@@ -210,7 +210,7 @@
 - name: "updater - remove conf file for user-dirs.* and recreate"
   become: true
   become_user: "{{ outer_item.name }}"
-  ansible.builtin.shell: rm ~/.config/user-dirs.{dirs,locale} ; xdg-user-dirs-update --force
+  ansible.builtin.shell: set -o pipefail && rm ~/.config/user-dirs.{dirs,locale} ; xdg-user-dirs-update --force
   when: locale_lang != outer_item.locale or locale_language != outer_item.language
   tags:
     - updater
