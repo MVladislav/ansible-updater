@@ -105,6 +105,19 @@
 
 # ------------------------------------------------------------------------------
 # SETUP NTP by chrony
+
+# ------------------------------------------------------------------------------
+# CHECK IF SERVICE INSTALLED
+- name: "updater - check if service chrony installed"
+  become: true
+  ansible.builtin.shell: command -v chrony >/dev/null 2>&1
+  register: is_chrony_exist
+  ignore_errors: true
+  changed_when: my_output.rc != 0
+  tags:
+    - install_client
+    - chrony
+
 - name: "updater - add /etc/chrony/chrony.conf"
   become: true
   ansible.builtin.copy:
@@ -209,6 +222,7 @@
       # change it if necessary.
       rtconutc
   register: systemd_chrony
+  when: (is_chrony_exist.rc is defined and is_chrony_exist.rc == 0)
   tags:
     - updater
     - chrony
@@ -219,7 +233,10 @@
     name: chrony
     state: restarted
     enabled: true
-  when: systemd_chrony is defined and (systemd_chrony.changed is defined and systemd_chrony.changed | bool)
+  when: >
+    (is_chrony_exist.rc is defined and is_chrony_exist.rc == 0)
+    and systemd_chrony is defined
+    and (systemd_chrony.changed is defined and systemd_chrony.changed | bool)
 
 # ------------------------------------------------------------------------------
 # SETUP ZFS
