@@ -15,6 +15,7 @@ updater_dependencies:
 # ------------------------------------------------------------------------------
 updater_config:
   set_timezone: true
+  set_time_sync: true
   sync_time: true
   set_language: true
   update_upgrade: true
