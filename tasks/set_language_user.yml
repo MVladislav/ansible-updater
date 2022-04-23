@@ -212,6 +212,9 @@
   become_user: "{{ outer_item.name }}"
   ansible.builtin.shell: set -o pipefail && rm ~/.config/user-dirs.{dirs,locale} ; xdg-user-dirs-update --force
   when: locale_lang != outer_item.locale or locale_language != outer_item.language
+  register: language_rm_user_dirs
+  changed_when: language_rm_user_dirs.rc is defined and language_rm_user_dirs.rc == 0
+  failed_when: language_rm_user_dirs.rc is defined and language_rm_user_dirs.rc == 999
   tags:
     - updater
     - system_local
