@@ -9,7 +9,7 @@ clients:
     language: en_US.UTF-8
 
 updater_dependencies:
-  - systemd-timesyncd
+  # - systemd-timesyncd
   - locales
 
 # ------------------------------------------------------------------------------

@@ -32,7 +32,7 @@
     state: restarted
     enabled: true
   when: >
-    and systemd_timesyncd_updated is defined
+    systemd_timesyncd_updated is defined
     and systemd_timesyncd_updated.changed is defined
     and systemd_timesyncd_updated.changed | bool
   tags:
