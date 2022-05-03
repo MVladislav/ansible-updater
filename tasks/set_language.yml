@@ -109,8 +109,9 @@
 - name: updater - parse 'LANG' from current locale and language configuration
   become: true
   ansible.builtin.set_fact:
-    locale_lang: "{{ locale_status.stdout | regex_search('LANG=([^\n]+)', '\\1') | first }}"
-  when: locale_status is defined and locale_status.stdout is defined
+    locale_lang: >
+      {{ locale_status.stdout | regex_search('LANG=([^\n]+)', '\\1') | first }}
+  when: locale_status is defined and locale_status.stdout is defined and locale_status.stdout|length > 0
   tags:
     - updater
     - system_local
@@ -120,7 +121,7 @@
   become: true
   ansible.builtin.set_fact:
     locale_language: "{{ locale_status.stdout | regex_search('LANGUAGE=([^\n]+)', '\\1') | default([locale_lang], true) | first }}"
-  when: locale_status is defined and locale_status.stdout is defined
+  when: locale_status is defined and locale_status.stdout is defined and locale_status.stdout|length > 0
   tags:
     - updater
     - system_local
