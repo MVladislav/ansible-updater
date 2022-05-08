@@ -5,7 +5,8 @@
 # SETUP NTP by timesyncd
 - name: "updater - check if service systemd-timesyncd installed"
   become: true
-  ansible.builtin.stat: path=/etc/init.d/systemd-timesyncd
+  ansible.builtin.stat:
+    path: /lib/systemd/system/systemd-timesyncd.service
   register: systemd_timesyncd_exist
   tags:
     - install_client
@@ -43,7 +44,8 @@
 # SETUP NTP by chrony
 - name: "updater - check if service chrony installed"
   become: true
-  ansible.builtin.stat: path=/etc/init.d/chrony
+  ansible.builtin.stat:
+    path: /etc/init.d/chrony
   register: chrony_exist
   tags:
     - install_client
