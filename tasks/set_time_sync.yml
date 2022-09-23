@@ -1,0 +1,80 @@
+---
+# tasks file for ./roles/updater
+
+# ------------------------------------------------------------------------------
+# SETUP NTP by timesyncd
+- name: "updater - check if service systemd-timesyncd installed"
+  become: true
+  ansible.builtin.stat:
+    path: /lib/systemd/system/systemd-timesyncd.service
+  register: systemd_timesyncd_exist
+  tags:
+    - install_client
+    - systemd-timesyncd
+
+- name: "updater - add/change /etc/systemd/timesyncd.conf"
+  become: true
+  ansible.builtin.template:
+    src: timesyncd.conf.j2
+    dest: /etc/systemd/timesyncd.conf
+    mode: 0644
+    owner: root
+    group: root
+  register: systemd_timesyncd_updated
+  when: systemd_timesyncd_exist.stat is defined and systemd_timesyncd_exist.stat.exists
+  tags:
+    - updater
+    - systemd-timesyncd
+
+- name: "updater - restart systemd-timesyncd"
+  become: true
+  ansible.builtin.service:
+    name: systemd-timesyncd
+    state: restarted
+    enabled: true
+  when: >
+    systemd_timesyncd_updated is defined
+    and systemd_timesyncd_updated.changed is defined
+    and systemd_timesyncd_updated.changed | bool
+  tags:
+    - updater
+    - systemd-timesyncd
+
+# ------------------------------------------------------------------------------
+# SETUP NTP by chrony
+- name: "updater - check if service chrony installed"
+  become: true
+  ansible.builtin.stat:
+    path: /etc/init.d/chrony
+  register: chrony_exist
+  tags:
+    - install_client
+    - chrony
+
+- name: "updater - add/change /etc/chrony/chrony.conf"
+  become: true
+  ansible.builtin.template:
+    src: chrony.conf.j2
+    dest: /etc/chrony/chrony.conf
+    mode: 0644
+    owner: root
+    group: root
+  register: chrony_updated
+  when: chrony_exist.stat is defined and chrony_exist.stat.exists
+  tags:
+    - updater
+    - chrony
+
+- name: "updater - restart chrony"
+  become: true
+  ansible.builtin.service:
+    name: chrony
+    state: restarted
+    enabled: true
+  when: >
+    chrony_updated is defined
+    and chrony_updated.changed is defined
+    and chrony_updated.changed | bool
+  tags:
+    - install_client
+    - chrony

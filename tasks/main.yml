@@ -1,41 +1,81 @@
 ---
 # tasks file for ./roles/updater
 
+# ------------------------------------------------------------------------------
+- name: "updater - install dependencies"
+  become: true
+  ansible.builtin.apt:
+    pkg: "{{ item }}"
+    state: present
+    force_apt_get: true # apt-get instead of aptitude
+  loop: "{{ updater_dependencies|flatten(levels=1) }}"
+  when: updater_config.set_timezone is defined and updater_config.set_timezone | bool
+  tags:
+    - updater
+    - dependencies
+
+# ------------------------------------------------------------------------------
 # SET TIMEZONE
-- name: set timezone
-  include: set_timezone.yml
+- name: "updater - set timezone"
+  include_tasks: set_timezone.yml
   when: updater_config.set_timezone is defined and updater_config.set_timezone | bool
 
+# SET TIME SYNC
+- name: "updater - set time sync"
+  include_tasks: set_time_sync.yml
+  when: updater_config.set_time_sync is defined and updater_config.set_time_sync | bool
+
 # SYNC TIME
-- name: sync time
-  include: sync_time.yml
+- name: "updater - sync time"
+  include_tasks: sync_time.yml
   when: updater_config.sync_time is defined and updater_config.sync_time | bool
 
 # SET LANGUAGE
-- name: set language
-  include: set_language.yml
+- name: "updater - set language"
+  include_tasks: set_language.yml
   when: updater_config.set_language is defined and updater_config.set_language | bool
 
+- name: "updater - set language per user"
+  include_tasks: set_language_user.yml
+  loop: "{{ clients | flatten(levels=1) }}"
+  loop_control:
+    loop_var: outer_item
+  when: >
+    (clients is defined and (outer_item.locale is defined or outer_item.language is defined))
+    and (updater_config.set_language is defined and updater_config.set_language | bool)
+
 # ------------------------------------------------------------------------------
-- name: updater - update repositories
-  become: yes
-  apt:
-    update_cache: yes # equivalent of apt-get update
-    force_apt_get: yes # apt-get instead of aptitude
+- name: "updater - update repositories"
+  become: true
+  ansible.builtin.apt:
+    update_cache: true # equivalent of apt-get update
+    force_apt_get: true # apt-get instead of aptitude
     cache_valid_time: 3600
-    autoremove: yes
-    autoclean: yes
+    autoremove: true
+    autoclean: true
   when: updater_config.update_upgrade is defined and updater_config.update_upgrade | bool
   tags:
     - updater
     - update
 
 - name: updater - upgrade packages
-  become: yes
-  apt:
+  become: true
+  ansible.builtin.apt:
     upgrade: dist # If yes or safe, performs an aptitude safe-upgrade.
-    force_apt_get: yes # apt-get instead of aptitude
+    force_apt_get: true # apt-get instead of aptitude
   when: updater_config.update_upgrade is defined and updater_config.update_upgrade | bool
   tags:
     - updater
     - upgrade
+
+# ------------------------------------------------------------------------------
+# SETUP ZFS
+- name: "updater - setup zfs"
+  include_tasks: setup_zfs.yml
+  when: updater_config.setup_zfs is defined and updater_config.setup_zfs | bool
+
+# ------------------------------------------------------------------------------
+# SETUP UNATTENDED-UPGRADES
+- name: "updater - setup unattended-upgrades"
+  include_tasks: unattended-upgrades.yml
+  when: updater_config.setup_unattended is defined and updater_config.setup_unattended | bool

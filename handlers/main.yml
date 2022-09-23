@@ -2,5 +2,5 @@
 # handlers file for ./roles/updater
 
 - name: reconfigure tzdata
-  become: yes
-  shell: dpkg-reconfigure -f noninteractive tzdata
+  become: true
+  ansible.builtin.command: dpkg-reconfigure -f noninteractive tzdata

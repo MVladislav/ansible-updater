@@ -3,15 +3,19 @@
 
 # ------------------------------------------------------------------------------
 - name: "updater - sync time step 1 - disable timedatectl ntp [set-ntp off]"
-  become: yes
-  command: "timedatectl set-ntp off"
+  become: true
+  ansible.builtin.command: "timedatectl set-ntp off"
+  register: timedatectl_off_output
+  changed_when: timedatectl_off_output.rc != 0
   tags:
     - updater
     - sync_time
 
 - name: "updater - sync time step 2 - activate timedatectl ntp [set-ntp on]"
-  become: yes
-  command: "timedatectl set-ntp on"
+  become: true
+  ansible.builtin.command: "timedatectl set-ntp on"
+  register: timedatectl_on_output
+  changed_when: timedatectl_on_output.rc != 0
   tags:
     - updater
     - sync_time

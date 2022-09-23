@@ -4,11 +4,11 @@
 # ------------------------------------------------------------------------------
 - name: "updater - ensure /etc/timezone contains {{ updater_time_timezone }}"
   become: true
-  lineinfile:
+  ansible.builtin.lineinfile:
     name: /etc/timezone
     line: "{{ updater_time_timezone }}"
     state: present
-  check_mode: yes
+  check_mode: true
   register: checktimezone
   tags:
     - updater
@@ -16,7 +16,7 @@
 
 - name: "updater - remove /etc/localtime"
   become: true
-  file:
+  ansible.builtin.file:
     path: "/etc/localtime"
     state: absent
   when: checktimezone.changed
@@ -25,13 +25,13 @@
     - timezone
 
 - name: "updater - update /etc/timezone with {{ updater_time_timezone }}"
-  become: yes
-  copy:
+  become: true
+  ansible.builtin.copy:
     content: "{{ updater_time_timezone }}"
     dest: "/etc/timezone"
     owner: root
     group: root
-    mode: "0644"
+    mode: 0644
   notify: reconfigure tzdata
   when: checktimezone.changed
   tags:

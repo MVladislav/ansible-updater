@@ -1,0 +1,231 @@
+---
+# tasks file for ./roles/updater
+
+# ------------------------------------------------------------------------------
+- name: >
+    updater - ensure language packages are installed for
+    'language-pack-{{ outer_item.locale.split('_')[0] }}'
+    and 'language-pack-{{ outer_item.locale.split('_')[0] }}-base'
+    (for user {{ outer_item }})
+  become: true
+  ansible.builtin.apt:
+    pkg: "{{ item }}"
+    state: present
+    update_cache: true
+  with_items:
+    - "language-pack-{{ outer_item.locale.split('_')[0] }}"
+    - "language-pack-{{ outer_item.locale.split('_')[0] }}-base"
+    - "language-pack-gnome-{{ outer_item.locale.split('_')[0] }}"
+    - "language-pack-gnome-{{ outer_item.locale.split('_')[0] }}-base"
+  register: locale_languages
+  when: outer_item.locale is defined
+  tags:
+    - updater
+    - system_local
+    - system_local_user
+
+- name: "updater - ensure dpkg is reconfigured (for user {{ outer_item }})"
+  become: true
+  ansible.builtin.command: dpkg-reconfigure locales -f noninteractive
+  when: locale_languages is defined and locale_languages.changed
+  tags:
+    - updater
+    - system_local
+    - system_local_user
+
+# ------------------------------------------------------------------------------
+- name: "updater - ensure localization files for {{ outer_item.locale }} are available (for user {{ outer_item }})"
+  become: true
+  locale_gen:
+    name: "{{ outer_item.locale }}"
+    state: present
+  tags:
+    - updater
+    - system_local
+    - system_local_user
+
+- name: "updater - ensure localization files for {{ outer_item.language }} are available (for user {{ outer_item }})"
+  become: true
+  locale_gen:
+    name: "{{ outer_item.language }}"
+    state: present
+  tags:
+    - updater
+    - system_local
+    - system_local_user
+
+# ------------------------------------------------------------------------------
+- name: "updater - get current locale and language configuration (for user {{ outer_item }})"
+  become: true
+  become_user: "{{ outer_item.name }}"
+  ansible.builtin.command: locale
+  register: locale_status
+  changed_when: false
+  tags:
+    - updater
+    - system_local
+    - system_local_user
+
+- name: "updater - parse 'LANG' from current locale and language configuration (for user {{ outer_item }})"
+  become: true
+  become_user: "{{ outer_item.name }}"
+  ansible.builtin.set_fact:
+    locale_lang: "{{ locale_status.stdout | regex_search('LANG=([^\n]+)', '\\1') | first }}"
+  when: locale_status is defined and locale_status.stdout is defined
+  tags:
+    - updater
+    - system_local
+    - system_local_user
+
+- name: "updater - parse 'LANGUAGE' from current locale and language configuration (for user {{ outer_item }})"
+  become: true
+  become_user: "{{ outer_item.name }}"
+  ansible.builtin.set_fact:
+    locale_language: "{{ locale_status.stdout | regex_search('LANGUAGE=([^\n]+)', '\\1') | default([locale_lang], true) | first }}"
+  when: locale_status is defined and locale_status.stdout is defined
+  tags:
+    - updater
+    - system_local
+    - system_local_user
+
+    # # ------------------------------------------------------------------------------
+    # - name: "updater - configure locale to {{ outer_item.locale }} (for user {{ outer_item }})"
+    #   become: true
+    #   become_user: "{{ outer_item.name }}"
+    #   command: "localectl set-locale LANG={{ outer_item.locale }}"
+    #   changed_when: locale_lang != outer_item.locale
+    #   when: locale_lang is defined and outer_item.locale is defined
+    #   tags:
+    #     - updater
+    #     - system_local
+    #      - system_local_user
+
+    # - name: "updater - configure language to {{ outer_item.language }} (for user {{ outer_item }})"
+    #   become: true
+    #   become_user: "{{ outer_item.name }}"
+    #   command: "localectl set-locale LANGUAGE={{ outer_item.language }}"
+    #   changed_when: locale_language != outer_item.language
+    #   when: locale_language is defined and outer_item.language is defined
+    #   tags:
+    #     - updater
+    #     - system_local
+    #     - system_local_user
+
+# ------------------------------------------------------------------------------
+- name: "updater - ensure file '~/.pam_environment' exists (for user {{ outer_item }})"
+  become: true
+  become_user: "{{ outer_item.name }}"
+  ansible.builtin.copy:
+    content: ""
+    dest: "~/.pam_environment"
+    force: false
+    group: "{{ outer_item.name }}"
+    owner: "{{ outer_item.name }}"
+    mode: 0660
+
+- name: "updater - set language env variables in '~/.pam_environment' (for user {{ outer_item }})"
+  become: true
+  become_user: "{{ outer_item.name }}"
+  ansible.builtin.lineinfile:
+    dest: "~/.pam_environment"
+    state: present
+    regexp: "^{{ item.key }}(.*)="
+    line: "{{ item.key }} {{ item.value }}"
+  with_items:
+    - key: LC_CTYPE
+      value: "DEFAULT={{ outer_item.locale }}"
+    - key: LC_ALL
+      value: "DEFAULT={{ outer_item.locale }}"
+    - key: LANGUAGE
+      value: "DEFAULT={{ outer_item.locale.split('.')[0] }}:{{ outer_item.locale.split('_')[0] }}"
+    - key: LANG
+      value: "DEFAULT={{ outer_item.locale }}"
+    - key: LC_NUMERIC
+      value: "DEFAULT={{ outer_item.locale }}"
+    - key: LC_TIME
+      value: "DEFAULT={{ outer_item.locale }}"
+    - key: LC_MONETARY
+      value: "DEFAULT={{ outer_item.locale }}"
+    - key: LC_PAPER
+      value: "DEFAULT={{ outer_item.locale }}"
+    - key: LC_NAME
+      value: "DEFAULT={{ outer_item.locale }}"
+    - key: LC_ADDRESS
+      value: "DEFAULT={{ outer_item.locale }}"
+    - key: LC_TELEPHONE
+      value: "DEFAULT={{ outer_item.locale }}"
+    - key: LC_MEASUREMENT
+      value: "DEFAULT={{ outer_item.locale }}"
+    - key: LC_IDENTIFICATION
+      value: "DEFAULT={{ outer_item.locale }}"
+    - key: PAPERSIZE
+      value: "DEFAULT=a4"
+  tags:
+    - updater
+    - system_local
+    - system_local_user
+
+- name: "updater - set language env variables in '~/.profile' (for user {{ outer_item }})"
+  become: true
+  become_user: "{{ outer_item.name }}"
+  ansible.builtin.lineinfile:
+    dest: "~/.profile"
+    state: present
+    regexp: "^export(.*){{ item.key }}(.*)="
+    line: "export {{ item.key }}={{ item.value }}"
+  with_items:
+    - key: LC_CTYPE
+      value: "{{ outer_item.locale }}"
+    - key: LC_ALL
+      value: ""
+    - key: LANGUAGE
+      value: "{{ outer_item.locale }}"
+    - key: LANG
+      value: "{{ outer_item.locale }}"
+    - key: LC_NUMERIC
+      value: "{{ outer_item.locale }}"
+    - key: LC_TIME
+      value: "{{ outer_item.locale }}"
+    - key: LC_MONETARY
+      value: "{{ outer_item.locale }}"
+    - key: LC_PAPER
+      value: "{{ outer_item.locale }}"
+    - key: LC_NAME
+      value: "{{ outer_item.locale }}"
+    - key: LC_ADDRESS
+      value: "{{ outer_item.locale }}"
+    - key: LC_TELEPHONE
+      value: "{{ outer_item.locale }}"
+    - key: LC_MEASUREMENT
+      value: "{{ outer_item.locale }}"
+    - key: LC_IDENTIFICATION
+      value: "{{ outer_item.locale }}"
+    - key: PAPERSIZE
+      value: "a4"
+  tags:
+    - updater
+    - system_local
+    - system_local_user
+
+- name: "updater - remove conf file for user-dirs.* and recreate"
+  become: true
+  become_user: "{{ outer_item.name }}"
+  ansible.builtin.shell: set -o pipefail && rm ~/.config/user-dirs.{dirs,locale} ; xdg-user-dirs-update --force
+  when: locale_lang != outer_item.locale or locale_language != outer_item.language
+  register: language_rm_user_dirs
+  changed_when: language_rm_user_dirs.rc is defined and language_rm_user_dirs.rc == 0
+  failed_when: language_rm_user_dirs.rc is defined and language_rm_user_dirs.rc == 999
+  tags:
+    - updater
+    - system_local
+    - system_local_user
+
+# ------------------------------------------------------------------------------
+- name: "updater - ensure dpkg is reconfigured (for user {{ outer_item }})"
+  become: true
+  ansible.builtin.command: dpkg-reconfigure locales -f noninteractive
+  when: locale_lang != outer_item.locale or locale_language != outer_item.language
+  tags:
+    - updater
+    - system_local
+    - system_local_user
