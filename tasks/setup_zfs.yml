@@ -3,7 +3,7 @@
 
 - name: "updater - creating and setup /etc/modprobe.d/zfs.conf"
   become: true
-  ansible.builtin.shell: set -o pipefail && grep MemTotal /proc/meminfo | awk '{print $2}'
+  ansible.builtin.shell: set -o pipefail && echo $(($(getconf _PHYS_PAGES) * $(getconf PAGE_SIZE)))
   args:
     executable: /bin/bash
   register: node_memory_size
@@ -18,7 +18,7 @@
     dest: /etc/modprobe.d/zfs.conf
     content: |
       options zfs zfs_arc_min={{ ((node_memory_size.stdout|int/4))|round|int }}
-      options zfs zfs_arc_max={{ ((node_memory_size.stdout|int/2))|round|int }}
+      options zfs zfs_arc_max={{ ((node_memory_size.stdout|int))|round|int }}
     mode: 0644
   register: zfs_changes
   when: (node_memory_size is defined and node_memory_size.stdout is defined)
