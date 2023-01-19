@@ -112,6 +112,7 @@ unattended_install_on_shutdown: false
 # If empty or unset then no email is sent, make sure that you
 # have a working mail setup on your system. A package that provides
 # 'mailx' must be installed.
+# can be set to "root" or any mail address
 unattended_mail: false
 
 # -> Unattended-Upgrade::MailOnlyOnError
