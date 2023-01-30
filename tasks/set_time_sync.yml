@@ -3,7 +3,7 @@
 
 # ------------------------------------------------------------------------------
 # SETUP NTP by timesyncd
-- name: "updater - check if service systemd-timesyncd installed"
+- name: "UPDATER | time-sync | check if service systemd-timesyncd installed"
   become: true
   ansible.builtin.stat:
     path: /lib/systemd/system/systemd-timesyncd.service
@@ -12,7 +12,7 @@
     - install_client
     - systemd-timesyncd
 
-- name: "updater - add/change /etc/systemd/timesyncd.conf"
+- name: "UPDATER | time-sync | add/change /etc/systemd/timesyncd.conf"
   become: true
   ansible.builtin.template:
     src: timesyncd.conf.j2
@@ -26,23 +26,23 @@
     - updater
     - systemd-timesyncd
 
-- name: "updater - restart systemd-timesyncd"
+- name: "UPDATER | time-sync | restart systemd-timesyncd"
   become: true
   ansible.builtin.service:
     name: systemd-timesyncd
     state: restarted
     enabled: true
-  when: >
-    systemd_timesyncd_updated is defined
-    and systemd_timesyncd_updated.changed is defined
-    and systemd_timesyncd_updated.changed | bool
+  when:
+    - systemd_timesyncd_updated is defined
+    - systemd_timesyncd_updated.changed is defined
+    - systemd_timesyncd_updated.changed | bool
   tags:
     - updater
     - systemd-timesyncd
 
 # ------------------------------------------------------------------------------
 # SETUP NTP by chrony
-- name: "updater - check if service chrony installed"
+- name: "UPDATER | time-sync | check if service chrony installed"
   become: true
   ansible.builtin.stat:
     path: /etc/init.d/chrony
@@ -51,7 +51,7 @@
     - install_client
     - chrony
 
-- name: "updater - add/change /etc/chrony/chrony.conf"
+- name: "UPDATER | time-sync | add/change /etc/chrony/chrony.conf"
   become: true
   ansible.builtin.template:
     src: chrony.conf.j2
@@ -65,16 +65,16 @@
     - updater
     - chrony
 
-- name: "updater - restart chrony"
+- name: "UPDATER | time-sync | restart chrony"
   become: true
   ansible.builtin.service:
     name: chrony
     state: restarted
     enabled: true
-  when: >
-    chrony_updated is defined
-    and chrony_updated.changed is defined
-    and chrony_updated.changed | bool
+  when:
+    - chrony_updated is defined
+    - chrony_updated.changed is defined
+    - chrony_updated.changed | bool
   tags:
     - install_client
     - chrony

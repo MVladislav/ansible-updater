@@ -2,7 +2,7 @@
 # tasks file for ./roles/updater
 
 # ------------------------------------------------------------------------------
-- name: "updater - sync time step 1 - disable timedatectl ntp [set-ntp off]"
+- name: "UPDATER | sync-time | sync time step 1 - disable timedatectl ntp [set-ntp off]"
   become: true
   ansible.builtin.command: "timedatectl set-ntp off"
   register: timedatectl_off_output
@@ -11,7 +11,7 @@
     - updater
     - sync_time
 
-- name: "updater - sync time step 2 - activate timedatectl ntp [set-ntp on]"
+- name: "UPDATER | sync-time | sync time step 2 - activate timedatectl ntp [set-ntp on]"
   become: true
   ansible.builtin.command: "timedatectl set-ntp on"
   register: timedatectl_on_output

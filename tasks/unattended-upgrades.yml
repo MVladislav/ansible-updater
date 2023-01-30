@@ -3,28 +3,28 @@
 # <https://github.com/jnv/ansible-role-unattended-upgrades>
 
 # ------------------------------------------------------------------------------
-- name: "updater - install unattended-upgrades"
+- name: "UPDATER | unattended | install unattended-upgrades"
   become: true
   ansible.builtin.apt:
     pkg:
       - unattended-upgrades
       - powermgmt-base
     state: present
-    cache_valid_time: "{{ unattended_cache_valid_time }}"
+    cache_valid_time: "{{ updater_unattended_cache_valid_time }}"
     update_cache: true
   tags:
     - updater
     - unattended_upgrades
 
 # ------------------------------------------------------------------------------
-- name: "updater - add distribution-specific variables"
+- name: "UPDATER | unattended | add distribution-specific variables"
   ansible.builtin.include_vars: "{{ ansible_distribution }}.yml"
   tags:
     - updater
     - unattended_upgrades
 
 # ------------------------------------------------------------------------------
-- name: "updater - create APT auto-upgrades configuration"
+- name: "UPDATER | unattended | create APT auto-upgrades configuration"
   become: true
   ansible.builtin.template:
     src: auto-upgrades.j2
@@ -36,7 +36,7 @@
     - updater
     - unattended_upgrades
 
-- name: "updater - create unattended-upgrades configuration"
+- name: "UPDATER | unattended | create unattended-upgrades configuration"
   become: true
   ansible.builtin.template:
     src: unattended-upgrades.j2

@@ -32,7 +32,7 @@
 
 # ------------------------------------------------------------------------------
 # ENV
-- name: updater - set language env variables
+- name: "UPDATER | lang | set language env variables"
   become: true
   ansible.builtin.lineinfile:
     dest: "/etc/default/locale"
@@ -50,7 +50,7 @@
 
 # ------------------------------------------------------------------------------
 - name: >
-    updater - ensure language packages are installed for
+    UPDATER | lang | ensure language packages are installed for
     'language-pack-{{ updater_config_system_locale.split('_')[0] }}'
     and 'language-pack-{{ updater_config_system_locale.split('_')[0] }}-base'
   become: true
@@ -69,7 +69,7 @@
     - updater
     - system_local
 
-- name: updater - ensure dpkg is reconfigured
+- name: "UPDATER | lang | ensure dpkg is reconfigured"
   become: true
   ansible.builtin.command: dpkg-reconfigure locales -f noninteractive
   when: locale_languages is defined and locale_languages.changed
@@ -78,7 +78,7 @@
     - system_local
 
 # ------------------------------------------------------------------------------
-- name: "updater - ensure localization files for {{ updater_config_system_locale }} are available"
+- name: "UPDATER | lang | ensure localization files for {{ updater_config_system_locale }} are available"
   become: true
   locale_gen:
     name: "{{ updater_config_system_locale }}"
@@ -87,7 +87,7 @@
     - updater
     - system_local
 
-- name: "updater - ensure localization files for {{ updater_config_system_language }} are available"
+- name: "UPDATER | lang | ensure localization files for {{ updater_config_system_language }} are available"
   become: true
   locale_gen:
     name: "{{ updater_config_system_language }}"
@@ -97,7 +97,7 @@
     - system_local
 
 # ------------------------------------------------------------------------------
-- name: updater - get current locale and language configuration
+- name: "UPDATER | lang | get current locale and language configuration"
   become: true
   ansible.builtin.command: localectl status
   register: locale_status
@@ -106,7 +106,7 @@
     - updater
     - system_local
 
-- name: updater - parse 'LANG' from current locale and language configuration
+- name: "UPDATER | lang | parse 'LANG' from current locale and language configuration"
   become: true
   ansible.builtin.set_fact:
     locale_lang: "{{ locale_status.stdout | regex_search('LANG=([^\n]+)', '\\1') | default([locale_lang], true) | first }}"
@@ -116,7 +116,7 @@
     - system_local
 
 # ------------------------------------------------------------------------------
-- name: updater - parse 'LANGUAGE' from current locale and language configuration
+- name: "UPDATER | lang | parse 'LANGUAGE' from current locale and language configuration"
   become: true
   ansible.builtin.set_fact:
     locale_language: "{{ locale_status.stdout | regex_search('LANGUAGE=([^\n]+)', '\\1') | default([locale_lang], true) | first }}"
@@ -125,7 +125,7 @@
     - updater
     - system_local
 
-- name: "updater - configure locale to {{ updater_config_system_locale }} and language to {{ updater_config_system_language }}"
+- name: "UPDATER | lang | configure locale to {{ updater_config_system_locale }} and language to {{ updater_config_system_language }}"
   become: true
   ansible.builtin.command: "localectl set-locale LANG={{ updater_config_system_locale }} LANGUAGE={{ updater_config_system_language }}"
   changed_when: locale_lang != updater_config_system_locale or locale_language != updater_config_system_language

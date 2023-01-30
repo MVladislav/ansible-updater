@@ -2,13 +2,13 @@
 # tasks file for ./roles/updater
 
 # ------------------------------------------------------------------------------
-- name: "updater - install dependencies"
+- name: "UPDATER | apt | install dependencies"
   become: true
   ansible.builtin.apt:
     pkg: "{{ item }}"
     state: present
     force_apt_get: true # apt-get instead of aptitude
-  loop: "{{ updater_dependencies|flatten(levels=1) }}"
+  loop: "{{ updater_dependencies | flatten(levels=1) }}"
   when: updater_config.set_timezone is defined and updater_config.set_timezone | bool
   tags:
     - updater
@@ -16,27 +16,27 @@
 
 # ------------------------------------------------------------------------------
 # SET TIMEZONE
-- name: "updater - set timezone"
-  include_tasks: set_timezone.yml
+- name: "UPDATER | time-zone | set timezone"
+  ansible.builtin.include_tasks: set_timezone.yml
   when: updater_config.set_timezone is defined and updater_config.set_timezone | bool
 
 # SET TIME SYNC
-- name: "updater - set time sync"
-  include_tasks: set_time_sync.yml
+- name: "UPDATER | time-sync | set time sync"
+  ansible.builtin.include_tasks: set_time_sync.yml
   when: updater_config.set_time_sync is defined and updater_config.set_time_sync | bool
 
 # SYNC TIME
-- name: "updater - sync time"
-  include_tasks: sync_time.yml
+- name: "UPDATER | sync-time | sync time"
+  ansible.builtin.include_tasks: sync_time.yml
   when: updater_config.sync_time is defined and updater_config.sync_time | bool
 
 # SET LANGUAGE
-- name: "updater - set language"
-  include_tasks: set_language.yml
+- name: "UPDATER | lang | set language"
+  ansible.builtin.include_tasks: set_language.yml
   when: updater_config.set_language is defined and updater_config.set_language | bool
 
-- name: "updater - set language per user"
-  include_tasks: set_language_user.yml
+- name: "UPDATER | lang-user | set language per user"
+  ansible.builtin.include_tasks: set_language_user.yml
   loop: "{{ clients | flatten(levels=1) }}"
   loop_control:
     loop_var: outer_item
@@ -45,7 +45,7 @@
     and (updater_config.set_language is defined and updater_config.set_language | bool)
 
 # ------------------------------------------------------------------------------
-- name: "updater - update repositories"
+- name: "UPDATER | apt | update repositories"
   become: true
   ansible.builtin.apt:
     update_cache: true # equivalent of apt-get update
@@ -58,7 +58,7 @@
     - updater
     - update
 
-- name: updater - upgrade packages
+- name: UPDATER | apt | upgrade packages
   become: true
   ansible.builtin.apt:
     upgrade: dist # If yes or safe, performs an aptitude safe-upgrade.
@@ -70,12 +70,12 @@
 
 # ------------------------------------------------------------------------------
 # SETUP ZFS
-- name: "updater - setup zfs"
-  include_tasks: setup_zfs.yml
+- name: "UPDATER | zfs | setup zfs"
+  ansible.builtin.include_tasks: setup_zfs.yml
   when: updater_config.setup_zfs is defined and updater_config.setup_zfs | bool
 
 # ------------------------------------------------------------------------------
 # SETUP UNATTENDED-UPGRADES
-- name: "updater - setup unattended-upgrades"
-  include_tasks: unattended-upgrades.yml
+- name: "UPDATER | unattended | setup unattended-upgrades"
+  ansible.builtin.include_tasks: unattended-upgrades.yml
   when: updater_config.setup_unattended is defined and updater_config.setup_unattended | bool

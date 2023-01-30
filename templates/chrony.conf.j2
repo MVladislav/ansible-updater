@@ -29,10 +29,7 @@
 #pool 1.ubuntu.pool.nto.org iburst maxsources 1
 #pool 2.ubuntu.pool.nto.org iburst maxsources 2
 
-# server {{ updater_ntp_server }} minpoll 8
-# server {{ updater_ntp_fallback_server }} minpoll 8
-
-server {{ updater_ntp_server }} iburst maxsources 4
+server {{ updater_ntp_server }} minpoll 2 maxpoll 2 xleave
 server {{ updater_ntp_fallback_server }} iburst maxsources 1
 
 # Look here for the admin password needed for chronyc.  The initial
