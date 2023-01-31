@@ -32,21 +32,21 @@
 
 # ------------------------------------------------------------------------------
 # ENV
-- name: "UPDATER | lang | set language env variables"
-  become: true
-  ansible.builtin.lineinfile:
-    dest: "/etc/default/locale"
-    state: present
-    regexp: "^{{ item.key }}="
-    line: "{{ item.key }}={{ item.value }}"
-  with_items:
-    - key: LC_ALL
-      value: "{{ updater_config_system_locale }}"
-    - key: LC_CTYPE
-      value: C.UTF-8
-  tags:
-    - updater
-    - system_local
+# - name: "UPDATER | lang | set language env variables"
+#   become: true
+#   ansible.builtin.lineinfile:
+#     dest: /etc/default/locale
+#     state: present
+#     regexp: "^{{ item.key }}="
+#     line: "{{ item.key }}={{ item.value }}"
+#   with_items:
+#     - key: LC_ALL
+#       value: "{{ updater_config_system_locale }}"
+#     - key: LC_CTYPE
+#       value: C.UTF-8
+#   tags:
+#     - updater
+#     - system_local
 
 # ------------------------------------------------------------------------------
 - name: >
