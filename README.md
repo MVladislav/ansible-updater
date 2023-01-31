@@ -3,6 +3,7 @@
 **updater**, is updating and upgrading the packages.
 
 [![Ansible Lint](https://github.com/MVladislav/ansible-updater/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/MVladislav/ansible-updater/actions/workflows/ansible-lint.yml)
+[![Ansible Molecule Test](https://github.com/MVladislav/ansible-updater/actions/workflows/ci.yml/badge.svg)](https://github.com/MVladislav/ansible-updater/actions/workflows/ci.yml)
 
 - Check out for more info how to use **apt**
   - <https://docs.ansible.com/ansible/latest/modules/apt_module.html>

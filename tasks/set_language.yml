@@ -111,8 +111,11 @@
 - name: "UPDATER | lang | parse 'LANG' from current locale and language configuration"
   become: true
   ansible.builtin.set_fact:
-    locale_lang: "{{ locale_status.stdout | regex_search('LANG=([^\n]+)', '\\1') | default([locale_lang], true) | first }}"
-  when: locale_status is defined and locale_status.stdout is defined and locale_status.stdout|length > 0
+    locale_lang: "{{ locale_status.stdout | regex_search('LANG=([^\n]+)', '\\1') | default([''], true) | first }}"
+  when:
+    - locale_status is defined
+    - locale_status.stdout is defined
+    - locale_status.stdout | length > 0
   tags:
     - updater
     - system_local
@@ -121,7 +124,10 @@
   become: true
   ansible.builtin.set_fact:
     locale_language: "{{ locale_status.stdout | regex_search('LANGUAGE=([^\n]+)', '\\1') | default([locale_lang], true) | first }}"
-  when: locale_status is defined and locale_status.stdout is defined and locale_status.stdout|length > 0
+  when:
+    - locale_status is defined
+    - locale_status.stdout is defined
+    - locale_status.stdout | length > 0
   tags:
     - updater
     - system_local
@@ -129,7 +135,7 @@
 # ------------------------------------------------------------------------------
 - name: "UPDATER | lang | configure locale to {{ updater_config_system_locale }} and language to {{ updater_config_system_language }}"
   become: true
-  ansible.builtin.command: "localectl set-locale LANG={{ updater_config_system_locale }} LANGUAGE={{ updater_config_system_language }} LC_ALL={{ updater_config_system_locale }}"
+  ansible.builtin.command: "localectl set-locale LANG={{ updater_config_system_locale }} LANGUAGE={{ updater_config_system_language }}"
   changed_when: locale_lang != updater_config_system_locale or locale_language != updater_config_system_language
   tags:
     - updater
