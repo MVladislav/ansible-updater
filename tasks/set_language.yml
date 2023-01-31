@@ -57,6 +57,7 @@
   ansible.builtin.apt:
     pkg: "{{ item }}"
     state: present
+    force_apt_get: true # apt-get instead of aptitude
     update_cache: true
   with_items:
     - "language-pack-{{ updater_config_system_locale.split('_')[0] }}"
@@ -78,18 +79,18 @@
     - system_local
 
 # ------------------------------------------------------------------------------
-- name: "UPDATER | lang | ensure localization files for {{ updater_config_system_locale }} are available"
+- name: "UPDATER | lang | ensure localization files are available for {{ updater_config_system_locale }}"
   become: true
-  locale_gen:
+  community.general.locale_gen:
     name: "{{ updater_config_system_locale }}"
     state: present
   tags:
     - updater
     - system_local
 
-- name: "UPDATER | lang | ensure localization files for {{ updater_config_system_language }} are available"
+- name: "UPDATER | lang | ensure localization files are available for {{ updater_config_system_language }}"
   become: true
-  locale_gen:
+  community.general.locale_gen:
     name: "{{ updater_config_system_language }}"
     state: present
   tags:
@@ -106,6 +107,7 @@
     - updater
     - system_local
 
+# ------------------------------------------------------------------------------
 - name: "UPDATER | lang | parse 'LANG' from current locale and language configuration"
   become: true
   ansible.builtin.set_fact:
@@ -115,7 +117,6 @@
     - updater
     - system_local
 
-# ------------------------------------------------------------------------------
 - name: "UPDATER | lang | parse 'LANGUAGE' from current locale and language configuration"
   become: true
   ansible.builtin.set_fact:
@@ -125,9 +126,10 @@
     - updater
     - system_local
 
+# ------------------------------------------------------------------------------
 - name: "UPDATER | lang | configure locale to {{ updater_config_system_locale }} and language to {{ updater_config_system_language }}"
   become: true
-  ansible.builtin.command: "localectl set-locale LANG={{ updater_config_system_locale }} LANGUAGE={{ updater_config_system_language }}"
+  ansible.builtin.command: "localectl set-locale LANG={{ updater_config_system_locale }} LANGUAGE={{ updater_config_system_language }} LC_ALL={{ updater_config_system_locale }}"
   changed_when: locale_lang != updater_config_system_locale or locale_language != updater_config_system_language
   tags:
     - updater

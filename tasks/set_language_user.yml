@@ -11,6 +11,7 @@
   ansible.builtin.apt:
     pkg: "{{ item }}"
     state: present
+    force_apt_get: true # apt-get instead of aptitude
     update_cache: true
   with_items:
     - "language-pack-{{ outer_item.locale.split('_')[0] }}"
@@ -36,7 +37,7 @@
 # ------------------------------------------------------------------------------
 - name: "UPDATER | lang | ensure localization files for {{ outer_item.locale }} are available - for user {{ outer_item }}"
   become: true
-  locale_gen:
+  community.general.locale_gen:
     name: "{{ outer_item.locale }}"
     state: present
   tags:
@@ -46,7 +47,7 @@
 
 - name: "UPDATER | lang | ensure localization files for {{ outer_item.language }} are available - for user {{ outer_item }}"
   become: true
-  locale_gen:
+  community.general.locale_gen:
     name: "{{ outer_item.language }}"
     state: present
   tags:

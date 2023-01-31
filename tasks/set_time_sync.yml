@@ -2,6 +2,37 @@
 # tasks file for ./roles/updater
 
 # ------------------------------------------------------------------------------
+- name: "UPDATER | time-sync | install systemd-timesyncd"
+  become: true
+  ansible.builtin.apt:
+    name: systemd-timesyncd
+    state: present
+    force_apt_get: true # apt-get instead of aptitude
+    update_cache: true
+  when:
+    - updater_ntp_serivce_use is defined
+    - updater_ntp_serivce_use.timesyncd is defined
+    - updater_ntp_serivce_use.timesyncd | bool
+  tags:
+    - updater
+    - dependencies
+
+- name: "UPDATER | time-sync | install chrony"
+  become: true
+  ansible.builtin.apt:
+    name: chrony
+    state: present
+    force_apt_get: true # apt-get instead of aptitude
+    update_cache: true
+  when:
+    - updater_ntp_serivce_use is defined
+    - updater_ntp_serivce_use.chrony is defined
+    - updater_ntp_serivce_use.chrony | bool
+  tags:
+    - updater
+    - dependencies
+
+# ------------------------------------------------------------------------------
 # SETUP NTP by timesyncd
 - name: "UPDATER | time-sync | check if service systemd-timesyncd installed"
   become: true
@@ -21,7 +52,9 @@
     owner: root
     group: root
   register: systemd_timesyncd_updated
-  when: systemd_timesyncd_exist.stat is defined and systemd_timesyncd_exist.stat.exists
+  when:
+    - systemd_timesyncd_exist.stat is defined
+    - systemd_timesyncd_exist.stat.exists | bool
   tags:
     - updater
     - systemd-timesyncd
@@ -60,7 +93,9 @@
     owner: root
     group: root
   register: chrony_updated
-  when: chrony_exist.stat is defined and chrony_exist.stat.exists
+  when:
+    - chrony_exist.stat is defined
+    - chrony_exist.stat.exists | bool
   tags:
     - updater
     - chrony
@@ -68,7 +103,7 @@
 - name: "UPDATER | time-sync | restart chrony"
   become: true
   ansible.builtin.service:
-    name: chrony
+    name: chronyd
     state: restarted
     enabled: true
   when:

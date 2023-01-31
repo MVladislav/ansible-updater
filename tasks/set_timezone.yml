@@ -2,14 +2,28 @@
 # tasks file for ./roles/updater
 
 # ------------------------------------------------------------------------------
-- name: "UPDATER | time-zone | ensure /etc/timezone contains {{ updater_time_timezone }}"
-  become: true
+- name: "UPDATER | time-zone | check for line in /etc/timezone with {{ updater_time_timezone }}"
   ansible.builtin.lineinfile:
-    name: /etc/timezone
     line: "{{ updater_time_timezone }}"
-    state: present
+    path: /etc/timezone
   check_mode: true
-  register: checktimezone
+  register: check_timezone
+  tags:
+    - updater
+    - timezone
+
+- name: "UPDATER | time-zone | update /etc/timezone with {{ updater_time_timezone }}"
+  become: true
+  ansible.builtin.copy:
+    content: "{{ updater_time_timezone }}"
+    dest: /etc/timezone
+    owner: root
+    group: root
+    mode: 0644
+  register: timezone_changed
+  when:
+    - check_timezone is defined
+    - check_timezone.changed | bool
   tags:
     - updater
     - timezone
@@ -20,26 +34,20 @@
     path: "/etc/localtime"
     state: absent
   when:
-    - checktimezone is defined
-    - checktimezone.changed is defined
-    - checktimezone.changed
+    - timezone_changed is defined
+    - timezone_changed.changed is defined
+    - timezone_changed.changed | bool
   tags:
     - updater
     - timezone
 
-- name: "UPDATER | time-zone | update /etc/timezone with {{ updater_time_timezone }}"
+- name: "UPDATER | time-zone | reconfigure tzdata"
   become: true
-  ansible.builtin.copy:
-    content: "{{ updater_time_timezone }}"
-    dest: "/etc/timezone"
-    owner: root
-    group: root
-    mode: 0644
-  notify: reconfigure tzdata
+  ansible.builtin.command: dpkg-reconfigure -f noninteractive tzdata
   when:
-    - checktimezone is defined
-    - checktimezone.changed is defined
-    - checktimezone.changed
+    - timezone_changed is defined
+    - timezone_changed.changed is defined
+    - timezone_changed.changed | bool
   tags:
     - updater
     - timezone

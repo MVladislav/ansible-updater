@@ -8,6 +8,7 @@
     pkg: "{{ item }}"
     state: present
     force_apt_get: true # apt-get instead of aptitude
+    update_cache: true
   loop: "{{ updater_dependencies | flatten(levels=1) }}"
   when: updater_config.set_timezone is defined and updater_config.set_timezone | bool
   tags:

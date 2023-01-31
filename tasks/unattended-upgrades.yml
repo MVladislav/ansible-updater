@@ -10,7 +10,7 @@
       - unattended-upgrades
       - powermgmt-base
     state: present
-    cache_valid_time: "{{ updater_unattended_cache_valid_time }}"
+    force_apt_get: true # apt-get instead of aptitude
     update_cache: true
   tags:
     - updater

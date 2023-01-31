@@ -9,9 +9,8 @@ clients:
     language: en_US.UTF-8
 
 updater_dependencies:
-  # - systemd-timesyncd
-  # - chrony
   - locales
+  - tzdata
 
 # ------------------------------------------------------------------------------
 updater_config:
@@ -27,6 +26,9 @@ updater_config:
 updater_time_timezone: Europe/Berlin
 
 # ------------------------------------------------------------------------------
+updater_ntp_serivce_use:
+  timesyncd: false
+  chrony: true
 updater_ntp_server: time.cloudflare.com
 updater_ntp_fallback_server: ntp.ubuntu.com
 
