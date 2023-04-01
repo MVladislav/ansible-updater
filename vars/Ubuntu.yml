@@ -1,3 +1,4 @@
 ---
 __updater_unattended_origins_patterns:
   - "origin=Ubuntu,archive=${distro_codename}-security,label=Ubuntu"
+  # - "origin=Ubuntu,archive=${distro_codename},label=Ubuntu"

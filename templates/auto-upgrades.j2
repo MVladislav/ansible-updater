@@ -1,8 +1,10 @@
 {{ ansible_managed | comment('c') }}
 
+// Perform unattended upgrades, it installs the available upgrades similar to the command 'sudo apt upgrade'
 APT::Periodic::Unattended-Upgrade "1";
 
 {% if updater_unattended_update_package_list is defined %}
+// Update the package lists, it is similar to running the 'sudo apt update' command
 APT::Periodic::Update-Package-Lists "{{updater_unattended_update_package_list}}";
 {% endif %}
 
