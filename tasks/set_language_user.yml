@@ -28,6 +28,7 @@
 - name: "UPDATER | lang | ensure dpkg is reconfigured - for user {{ outer_item }}"
   become: true
   ansible.builtin.command: dpkg-reconfigure locales -f noninteractive
+  changed_when: false
   when: locale_languages is defined and locale_languages.changed
   tags:
     - updater
@@ -225,6 +226,7 @@
 - name: "UPDATER | lang | ensure dpkg is reconfigured - for user {{ outer_item }}"
   become: true
   ansible.builtin.command: dpkg-reconfigure locales -f noninteractive
+  changed_when: false
   when: locale_lang != outer_item.locale or locale_language != outer_item.language
   tags:
     - updater

@@ -44,6 +44,7 @@
 - name: "UPDATER | time-zone | reconfigure tzdata"
   become: true
   ansible.builtin.command: dpkg-reconfigure -f noninteractive tzdata
+  changed_when: false
   when:
     - timezone_changed is defined
     - timezone_changed.changed is defined

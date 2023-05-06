@@ -29,6 +29,7 @@
 - name: "UPDATER | zfs | re-init zfs changes"
   become: true
   ansible.builtin.command: update-initramfs -u
+  changed_when: true
   when: (zfs_changes is defined and zfs_changes.changed is defined and zfs_changes.changed|bool)
   tags:
     - updater

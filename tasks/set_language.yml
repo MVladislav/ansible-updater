@@ -73,6 +73,7 @@
 - name: "UPDATER | lang | ensure dpkg is reconfigured"
   become: true
   ansible.builtin.command: dpkg-reconfigure locales -f noninteractive
+  changed_when: false
   when: locale_languages is defined and locale_languages.changed
   tags:
     - updater
