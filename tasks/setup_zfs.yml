@@ -19,7 +19,7 @@
     content: |
       options zfs zfs_arc_min={{ ((node_memory_size.stdout | int / 4)) | round | int }}
       options zfs zfs_arc_max={{ ((node_memory_size.stdout | int)) | round | int }}
-    mode: 0644
+    mode: "0644"
   register: zfs_changes
   when: (node_memory_size is defined and node_memory_size.stdout is defined)
   tags:

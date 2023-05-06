@@ -19,7 +19,7 @@
     dest: /etc/timezone
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   register: timezone_changed
   when:
     - check_timezone is defined

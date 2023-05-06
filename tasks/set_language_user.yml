@@ -123,7 +123,7 @@
     force: false
     group: "{{ outer_item.name }}"
     owner: "{{ outer_item.name }}"
-    mode: 0660
+    mode: "0660"
 
 - name: "UPDATER | lang | set language env variables in '~/.pam_environment' - for user {{ outer_item }}"
   become: true
