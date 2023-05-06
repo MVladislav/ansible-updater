@@ -30,9 +30,42 @@ _A list of other roles hosted on Galaxy should go here, plus any details in rega
 Example how to use:
 
 ```yml
-- hosts: servers
+- name: PRE | pre installer (1) | updater
+  remote_user: "{{ ansible_user }}"
+  hosts:
+    - pre
   roles:
-    - updater
+    ### -------------------------
+    - role: ansible-updater
+      # set language per client
+      clients:
+        - name: "{{ ansible_user }}"
+          locale: en_US.UTF-8
+          language: en_US.UTF-8
+      # define which modules should be performed
+      updater_config:
+        set_timezone: true
+        set_time_sync: true
+        sync_time: true
+        set_language: true
+        update_upgrade: true
+        setup_zfs: true
+        setup_unattended: true
+      # define your timezone
+      updater_time_timezone: Europe/Berlin
+      # set ntp servers
+      updater_ntp_server: time.cloudflare.com
+      updater_ntp_fallback_server: ntp.ubuntu.com
+      # set default system language
+      updater_language_default_pack: en
+      updater_config_system_locale: en_US.UTF-8
+      updater_config_system_language: en_US.UTF-8
+      # define pattern for unattended to update for
+      updater_unattended_origins_patterns:
+        - "origin=Ubuntu,archive=${distro_codename}-security"
+        - "o=Ubuntu,a=${distro_codename}"
+        - "o=Ubuntu,a=${distro_codename}-updates"
+        - "o=Ubuntu,a=${distro_codename}-proposed-updates"
 ```
 
 ## License
