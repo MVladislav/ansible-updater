@@ -53,7 +53,7 @@ Unattended-Upgrade::AutoFixInterruptedDpkg "false";
 Unattended-Upgrade::MinimalSteps "{{ updater_unattended_minimal_steps | lower }}";
 
 {% if updater_unattended_install_on_shutdown %}
-// Install all unattended-upgrades when the machine is shuting down
+// Install all unattended-upgrades when the machine is shutting down
 // instead of doing it in the background while the machine is running
 // This will (obviously) make shutdown slower
 Unattended-Upgrade::InstallOnShutdown "true";

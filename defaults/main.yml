@@ -114,7 +114,7 @@ updater_unattended_autofix_interrupted_dpkg: true
 updater_unattended_minimal_steps: true
 
 # -> Unattended-Upgrade::InstallOnShutdown
-# Install all unattended-upgrades when the machine is shuting down
+# Install all unattended-upgrades when the machine is shutting down
 # instead of doing it in the background while the machine is running
 # This will (obviously) make shutdown slower
 updater_unattended_install_on_shutdown: false

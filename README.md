@@ -1,29 +1,59 @@
-# Role Name
-
-**updater**, is updating and upgrading the packages.
+# System Updater
 
 [![Ansible Lint](https://github.com/MVladislav/ansible-updater/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/MVladislav/ansible-updater/actions/workflows/ansible-lint.yml)
 [![Ansible Molecule Test](https://github.com/MVladislav/ansible-updater/actions/workflows/ci.yml/badge.svg)](https://github.com/MVladislav/ansible-updater/actions/workflows/ci.yml)
 
-- Check out for more info how to use **apt**
-  - <https://docs.ansible.com/ansible/latest/modules/apt_module.html>
+- [System Updater](#system-updater)
+  - [Role Variables](#role-variables)
+  - [Dependencies](#dependencies)
+  - [Example Playbook](#example-playbook)
+  - [License](#license)
 
-## Requirements
+---
 
-_Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required._
+You can checkout [MVladislav - ansible-env-setup - playbooks](https://github.com/MVladislav/ansible-env-setup/tree/main/playbooks) for how i use it in general.
 
 ## Role Variables
 
 ```yml
+clients:
+  - name: "{{ ansible_user }}"
+    locale: en_US.UTF-8
+    language: en_US.UTF-8
+
+updater_dependencies:
+  - locales
+  - tzdata
+
+updater_config:
+  set_timezone: true
+  set_time_sync: true
+  sync_time: true
+  set_language: true
+  update_upgrade: true
+  setup_zfs: false
+  setup_unattended: true
+
 updater_time_timezone: Europe/Berlin
+
+updater_ntp_serivce_use:
+  timesyncd: false
+  chrony: true
+updater_ntp_server: time.cloudflare.com
+updater_ntp_fallback_server: ntp.ubuntu.com
+
 updater_language_default_pack: en
+
 updater_config_system_locale: en_US.UTF-8
 updater_config_system_language: en_US.UTF-8
+
+# multi unattended updater variables
+updater_unattended_*: ...
 ```
 
 ## Dependencies
 
-_A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles._
+Developed and testes with Ansible 2.14.4
 
 ## Example Playbook
 
@@ -60,18 +90,24 @@ Example how to use:
       updater_language_default_pack: en
       updater_config_system_locale: en_US.UTF-8
       updater_config_system_language: en_US.UTF-8
+      # define allowed for unattended to update for
+      updater_unattended_allowed_origins:
+        # - "Docker:${distro_codename}"
+        - "${distro_id}:${distro_codename}"
+        - "${distro_id}:${distro_codename}-security"
+        - "${distro_id}:${distro_codename}-updates"
+        - "${distro_id}ESMApps:${distro_codename}-apps-security"
+        - "${distro_id}ESM:${distro_codename}-infra-security"
       # define pattern for unattended to update for
       updater_unattended_origins_patterns:
-        - "origin=Ubuntu,archive=${distro_codename}-security"
-        - "o=Ubuntu,a=${distro_codename}"
-        - "o=Ubuntu,a=${distro_codename}-updates"
-        - "o=Ubuntu,a=${distro_codename}-proposed-updates"
+        # - "o=Docker,a=lunar,l=Docker CE,b=amd64"
+        # - "o=Ubuntu,a=${distro_codename},n=${distro_codename},l=Ubuntu"
+        - "o=Ubuntu,a=${distro_codename}-security,n=${distro_codename},l=Ubuntu"
+        - "o=Ubuntu,a=${distro_codename}-updates,n=${distro_codename},l=Ubuntu"
+        # - "o=Ubuntu,a=${distro_codename}-proposed-updates,n=${distro_codename},l=Ubuntu"
+        # - "o=Ubuntu,a=${distro_codename}-backports,n=${distro_codename},l=Ubuntu"
 ```
 
 ## License
 
-GNU AFFERO GENERAL PUBLIC LICENSE
-
-## Author Information
-
-MVladislav
+MIT

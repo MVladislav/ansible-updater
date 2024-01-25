@@ -1,10 +1,10 @@
 ---
 galaxy_info:
   author: MVladislav
-  description: Ansible role for install & setup updater
+  description: Ansible role for configure system basics & updater
   company: none
   license: MIT
-  min_ansible_version: "2.9"
+  min_ansible_version: "2.14"
   role_name: updater
   namespace: mvladislav
 
@@ -13,5 +13,7 @@ galaxy_info:
 
   galaxy_tags:
     - updater
+    - ubuntu
+    - linux
 
 dependencies: []
