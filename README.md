@@ -13,6 +13,10 @@
 
 You can checkout [MVladislav - ansible-env-setup - playbooks](https://github.com/MVladislav/ansible-env-setup/tree/main/playbooks) for how i use it in general.
 
+Tested with:
+
+- Ubuntu 23.04
+
 ## Role Variables
 
 ```yml
