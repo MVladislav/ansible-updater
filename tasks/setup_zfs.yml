@@ -21,7 +21,9 @@
       options zfs zfs_arc_max={{ ((node_memory_size.stdout | int)) | round | int }}
     mode: "0644"
   register: zfs_changes
-  when: (node_memory_size is defined and node_memory_size.stdout is defined)
+  when:
+    - node_memory_size is defined
+    - node_memory_size.stdout is defined
   tags:
     - updater
     - zfs
@@ -30,7 +32,10 @@
   become: true
   ansible.builtin.command: update-initramfs -u
   changed_when: true
-  when: (zfs_changes is defined and zfs_changes.changed is defined and zfs_changes.changed|bool)
+  when:
+    - zfs_changes is defined
+    - zfs_changes.changed is defined
+    - zfs_changes.changed | bool
   tags:
     - updater
     - zfs
