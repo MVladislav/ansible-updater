@@ -9,7 +9,7 @@
     - for user {{ outer_item }}
   become: true
   ansible.builtin.apt:
-    pkg: "{{ item }}"
+    name: "{{ item }}"
     state: present
     force_apt_get: true # apt-get instead of aptitude
     update_cache: true
@@ -89,29 +89,6 @@
     - updater
     - system_local
     - system_local_user
-
-    # # ------------------------------------------------------------------------------
-    # - name: "UPDATER | lang | configure locale to {{ outer_item.locale }} (for user {{ outer_item }})"
-    #   become: true
-    #   become_user: "{{ outer_item.name }}"
-    #   command: "localectl set-locale LANG={{ outer_item.locale }}"
-    #   changed_when: locale_lang != outer_item.locale
-    #   when: locale_lang is defined and outer_item.locale is defined
-    #   tags:
-    #     - updater
-    #     - system_local
-    #      - system_local_user
-
-    # - name: "UPDATER | lang | configure language to {{ outer_item.language }} (for user {{ outer_item }})"
-    #   become: true
-    #   become_user: "{{ outer_item.name }}"
-    #   command: "localectl set-locale LANGUAGE={{ outer_item.language }}"
-    #   changed_when: locale_language != outer_item.language
-    #   when: locale_language is defined and outer_item.language is defined
-    #   tags:
-    #     - updater
-    #     - system_local
-    #     - system_local_user
 
 # ------------------------------------------------------------------------------
 - name: "UPDATER | lang | ensure file '~/.pam_environment' exists - for user {{ outer_item }}"

@@ -2,53 +2,6 @@
 # tasks file for ./roles/updater
 
 # ------------------------------------------------------------------------------
-# #ln -fs /usr/share/zoneinfo/{{ time_zone_one }}/{{ time_zone_two }} /etc/localtime
-# # ------------------------------------------------------------------------------
-# - name: "(Re-)Generate locales"
-#   become: true
-#   locale_gen:
-#     name: "{{ item }}"
-#     state: present
-#   loop: "{{ languages|flatten(levels=1) }}"
-#   #when: item is defined and item is not none
-#   tags: updater
-
-# - name: "update locale"
-#   become: true
-#   command: >
-#     update-locale
-#     LANGUAGE={{ LANGUAGE }}
-#     LC_ALL={{ LC_ALL }}
-#     LC_TIME={{ LC_TIME }}
-#     LC_MONETARY={{ LC_MONETARY }}
-#     LC_ADDRESS={{ LC_ADDRESS }}
-#     LC_TELEPHONE={{ LC_TELEPHONE }}
-#     LC_NAME={{ LC_NAME }}
-#     LC_MEASUREMENT={{ LC_MEASUREMENT }}
-#     LC_IDENTIFICATION={{ LC_IDENTIFICATION }}
-#     LC_NUMERIC={{ LC_NUMERIC }}
-#     LC_PAPER={{ LC_PAPER }}
-#     LANG={{ LANG }}
-
-# ------------------------------------------------------------------------------
-# ENV
-# - name: "UPDATER | lang | set language env variables"
-#   become: true
-#   ansible.builtin.lineinfile:
-#     dest: /etc/default/locale
-#     state: present
-#     regexp: "^{{ item.key }}="
-#     line: "{{ item.key }}={{ item.value }}"
-#   with_items:
-#     - key: LC_ALL
-#       value: "{{ updater_config_system_locale }}"
-#     - key: LC_CTYPE
-#       value: C.UTF-8
-#   tags:
-#     - updater
-#     - system_local
-
-# ------------------------------------------------------------------------------
 - name: >
     UPDATER | lang | ensure language packages are installed for
     'language-pack-{{ updater_config_system_locale.split('_')[0] }}'

@@ -6,7 +6,7 @@
 - name: "UPDATER | unattended | install unattended-upgrades"
   become: true
   ansible.builtin.apt:
-    pkg:
+    name:
       - unattended-upgrades
       - powermgmt-base
     state: present
