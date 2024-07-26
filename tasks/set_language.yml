@@ -4,8 +4,7 @@
 # ------------------------------------------------------------------------------
 - name: >
     UPDATER | lang | ensure language packages are installed for
-    'language-pack-{{ updater_config_system_locale.split('_')[0] }}'
-    and 'language-pack-{{ updater_config_system_locale.split('_')[0] }}-base'
+    'language-pack-*' and 'language-pack-*-base' with * as defined
   become: true
   ansible.builtin.apt:
     pkg: "{{ item }}"
@@ -33,7 +32,7 @@
     - system_local
 
 # ------------------------------------------------------------------------------
-- name: "UPDATER | lang | ensure localization files are available for {{ updater_config_system_locale }}"
+- name: "UPDATER | lang | ensure localization files are available for system local"
   become: true
   community.general.locale_gen:
     name: "{{ updater_config_system_locale }}"
@@ -42,7 +41,7 @@
     - updater
     - system_local
 
-- name: "UPDATER | lang | ensure localization files are available for {{ updater_config_system_language }}"
+- name: "UPDATER | lang | ensure localization files are available for system language"
   become: true
   community.general.locale_gen:
     name: "{{ updater_config_system_language }}"
@@ -87,7 +86,7 @@
     - system_local
 
 # ------------------------------------------------------------------------------
-- name: "UPDATER | lang | configure locale to {{ updater_config_system_locale }} and language to {{ updater_config_system_language }}"
+- name: "UPDATER | lang | set LANG and LANGUAGE"
   become: true
   ansible.builtin.command: "localectl set-locale LANG={{ updater_config_system_locale }} LANGUAGE={{ updater_config_system_language }}"
   changed_when: locale_lang != updater_config_system_locale or locale_language != updater_config_system_language

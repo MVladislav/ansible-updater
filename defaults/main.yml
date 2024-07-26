@@ -16,7 +16,6 @@ updater_dependencies:
 updater_config:
   set_timezone: true
   set_time_sync: true
-  sync_time: true
   set_language: true
   update_upgrade: true
   setup_zfs: false
@@ -26,9 +25,7 @@ updater_config:
 updater_time_timezone: Europe/Berlin
 
 # ------------------------------------------------------------------------------
-updater_ntp_serivce_use:
-  timesyncd: false
-  chrony: true
+updater_ntp_serivce_use_time_synchronization_service: chrony # chrony | systemd-timesyncd
 updater_ntp_server: time.cloudflare.com
 updater_ntp_fallback_server: ntp.ubuntu.com
 
@@ -37,38 +34,6 @@ updater_language_default_pack: en
 
 updater_config_system_locale: en_US.UTF-8
 updater_config_system_language: en_US.UTF-8
-#
-# TODO: [cod] ex.: de | en | ...
-# TODO: sudo apt-get install language-pack-[cod] language-pack-gnome-[cod] language-pack-[cod]-base language-pack-gnome-[cod]-base
-# TODO: check-language-support -l [cod]
-# TODO: sudo apt-get -y install `check-language-support -l [cod]`
-#
-# LANGUAGE:
-# LC_ALL:
-# LC_TIME: "{{ updater_config_system_locale }}"
-# LC_MONETARY: "{{ updater_config_system_locale }}"
-# LC_ADDRESS: "{{ updater_config_system_locale }}"
-# LC_TELEPHONE: "{{ updater_config_system_locale }}"
-# LC_NAME: "{{ updater_config_system_locale }}"
-# LC_MEASUREMENT: "{{ updater_config_system_locale }}"
-# LC_IDENTIFICATION: "{{ updater_config_system_locale }}"
-# LC_NUMERIC: "{{ updater_config_system_language }}"
-# LC_PAPER: "{{ updater_config_system_locale }}"
-# LANG: "{{ updater_config_system_language }}"
-
-# languages:
-#   - "{{ LC_TIME }}"
-#   - "{{ LC_MONETARY }}"
-#   - "{{ LC_ADDRESS }}"
-#   - "{{ LC_TELEPHONE }}"
-#   - "{{ LC_NAME }}"
-#   - "{{ LC_MEASUREMENT }}"
-#   - "{{ LC_IDENTIFICATION }}"
-#   - "{{ LC_NUMERIC }}"
-#   - "{{ LC_PAPER }}"
-#   - "{{ LANG }}"
-#   - "{{ LANGUAGE }}"
-#   - "{{ LC_ALL }}"
 
 # ------------------------------------------------------------------------------
 # <https://github.com/jnv/ansible-role-unattended-upgrades>

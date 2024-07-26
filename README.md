@@ -32,7 +32,6 @@ updater_dependencies:
 updater_config:
   set_timezone: true
   set_time_sync: true
-  sync_time: true
   set_language: true
   update_upgrade: true
   setup_zfs: false
@@ -40,9 +39,7 @@ updater_config:
 
 updater_time_timezone: Europe/Berlin
 
-updater_ntp_serivce_use:
-  timesyncd: false
-  chrony: true
+updater_ntp_serivce_use_time_synchronization_service: chrony # chrony | systemd-timesyncd
 updater_ntp_server: time.cloudflare.com
 updater_ntp_fallback_server: ntp.ubuntu.com
 
@@ -80,7 +77,6 @@ Example how to use:
       updater_config:
         set_timezone: true
         set_time_sync: true
-        sync_time: true
         set_language: true
         update_upgrade: true
         setup_zfs: true

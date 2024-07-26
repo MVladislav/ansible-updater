@@ -5,7 +5,7 @@
 - name: "UPDATER | apt | install dependencies"
   become: true
   ansible.builtin.apt:
-    pkg: "{{ item }}"
+    name: "{{ item }}"
     state: present
     force_apt_get: true # apt-get instead of aptitude
     update_cache: true
@@ -31,13 +31,6 @@
   when:
     - updater_config.set_time_sync is defined
     - updater_config.set_time_sync | bool
-
-# SYNC TIME
-- name: "UPDATER | sync-time | sync time"
-  ansible.builtin.include_tasks: sync_time.yml
-  when:
-    - updater_config.sync_time is defined
-    - updater_config.sync_time | bool
 
 # SET LANGUAGE
 - name: "UPDATER | lang | set language"

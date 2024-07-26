@@ -4,9 +4,7 @@
 # ------------------------------------------------------------------------------
 - name: >
     UPDATER | lang | ensure language packages are installed for
-    'language-pack-{{ outer_item.locale.split('_')[0] }}'
-    and 'language-pack-{{ outer_item.locale.split('_')[0] }}-base'
-    - for user {{ outer_item }}
+    'language-pack-*' and 'language-pack-*-base' with * as defined
   become: true
   ansible.builtin.apt:
     name: "{{ item }}"
@@ -25,7 +23,7 @@
     - system_local
     - system_local_user
 
-- name: "UPDATER | lang | ensure dpkg is reconfigured - for user {{ outer_item }}"
+- name: "UPDATER | lang | ensure dpkg is reconfigured"
   become: true
   ansible.builtin.command: dpkg-reconfigure locales -f noninteractive
   changed_when: false
@@ -36,7 +34,7 @@
     - system_local_user
 
 # ------------------------------------------------------------------------------
-- name: "UPDATER | lang | ensure localization files for {{ outer_item.locale }} are available - for user {{ outer_item }}"
+- name: "UPDATER | lang | ensure localization files for specified language are available"
   become: true
   community.general.locale_gen:
     name: "{{ outer_item.locale }}"
@@ -46,7 +44,7 @@
     - system_local
     - system_local_user
 
-- name: "UPDATER | lang | ensure localization files for {{ outer_item.language }} are available - for user {{ outer_item }}"
+- name: "UPDATER | lang | ensure localization files for specified language are available"
   become: true
   community.general.locale_gen:
     name: "{{ outer_item.language }}"
@@ -57,7 +55,7 @@
     - system_local_user
 
 # ------------------------------------------------------------------------------
-- name: "UPDATER | lang | get current locale and language configuration - for user {{ outer_item }}"
+- name: "UPDATER | lang | get current locale and language configuration"
   become: true
   become_user: "{{ outer_item.name }}"
   ansible.builtin.command: locale
@@ -68,7 +66,7 @@
     - system_local
     - system_local_user
 
-- name: "UPDATER | lang | parse 'LANG' from current locale and language configuration - for user {{ outer_item }}"
+- name: "UPDATER | lang | parse 'LANG' from current locale and language configuration"
   become: true
   become_user: "{{ outer_item.name }}"
   ansible.builtin.set_fact:
@@ -79,7 +77,7 @@
     - system_local
     - system_local_user
 
-- name: "UPDATER | lang | parse 'LANGUAGE' from current locale and language configuration - for user {{ outer_item }}"
+- name: "UPDATER | lang | parse 'LANGUAGE' from current locale and language configuration"
   become: true
   become_user: "{{ outer_item.name }}"
   ansible.builtin.set_fact:
@@ -91,7 +89,7 @@
     - system_local_user
 
 # ------------------------------------------------------------------------------
-- name: "UPDATER | lang | ensure file '~/.pam_environment' exists - for user {{ outer_item }}"
+- name: "UPDATER | lang | ensure file '~/.pam_environment' exists"
   become: true
   become_user: "{{ outer_item.name }}"
   ansible.builtin.copy:
@@ -102,7 +100,7 @@
     owner: "{{ outer_item.name }}"
     mode: "0660"
 
-- name: "UPDATER | lang | set language env variables in '~/.pam_environment' - for user {{ outer_item }}"
+- name: "UPDATER | lang | set language env variables in '~/.pam_environment'"
   become: true
   become_user: "{{ outer_item.name }}"
   ansible.builtin.lineinfile:
@@ -158,7 +156,7 @@
     - system_local_user
 
 # ------------------------------------------------------------------------------
-- name: "UPDATER | lang | ensure dpkg is reconfigured - for user {{ outer_item }}"
+- name: "UPDATER | lang | ensure dpkg is reconfigured"
   become: true
   ansible.builtin.command: dpkg-reconfigure locales -f noninteractive
   changed_when: false

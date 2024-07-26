@@ -2,47 +2,46 @@
 # tasks file for ./roles/updater
 
 # ------------------------------------------------------------------------------
-- name: "UPDATER | time-sync | install systemd-timesyncd"
+- name: "UPDATER | time-sync | install service 'chrony or systemd-timesyncd' as specified"
   become: true
   ansible.builtin.apt:
-    name: systemd-timesyncd
+    name: "{{ updater_ntp_serivce_use_time_synchronization_service }}"
     state: present
-    force_apt_get: true # apt-get instead of aptitude
+    force_apt_get: true
     update_cache: true
-  when:
-    - updater_ntp_serivce_use is defined
-    - updater_ntp_serivce_use.timesyncd is defined
-    - updater_ntp_serivce_use.timesyncd | bool
   tags:
     - updater
-    - dependencies
+    - time-sync
 
-- name: "UPDATER | time-sync | install chrony"
+- name: "UPDATER | time-sync | remove chrony"
   become: true
   ansible.builtin.apt:
     name: chrony
-    state: present
-    force_apt_get: true # apt-get instead of aptitude
-    update_cache: true
+    state: absent
+    purge: true
   when:
-    - updater_ntp_serivce_use is defined
-    - updater_ntp_serivce_use.chrony is defined
-    - updater_ntp_serivce_use.chrony | bool
+    - updater_ntp_serivce_use_time_synchronization_service != "chrony"
   tags:
     - updater
-    - dependencies
+    - time-sync
+
+- name: "UPDATER | time-sync | mask systemd-timesyncd"
+  become: true
+  ansible.builtin.systemd_service:
+    name: systemd-timesyncd.service
+    daemon_reload: true
+    enabled: false
+    masked: true
+    state: stopped
+  failed_when: false # NOTE: sometimes throws error
+  when:
+    - updater_ntp_serivce_use_time_synchronization_service != "systemd-timesyncd"
+  tags:
+    - updater
+    - time-sync
 
 # ------------------------------------------------------------------------------
 # SETUP NTP by timesyncd
-- name: "UPDATER | time-sync | check if service systemd-timesyncd installed"
-  become: true
-  ansible.builtin.stat:
-    path: /lib/systemd/system/systemd-timesyncd.service
-  register: systemd_timesyncd_exist
-  tags:
-    - install_client
-    - systemd-timesyncd
-
 - name: "UPDATER | time-sync | add/change /etc/systemd/timesyncd.conf"
   become: true
   ansible.builtin.template:
@@ -53,10 +52,10 @@
     group: root
   register: systemd_timesyncd_updated
   when:
-    - systemd_timesyncd_exist.stat is defined
-    - systemd_timesyncd_exist.stat.exists | bool
+    - updater_ntp_serivce_use_time_synchronization_service == "systemd-timesyncd"
   tags:
     - updater
+    - time-sync
     - systemd-timesyncd
 
 - name: "UPDATER | time-sync | restart systemd-timesyncd"
@@ -71,19 +70,11 @@
     - systemd_timesyncd_updated.changed | bool
   tags:
     - updater
+    - time-sync
     - systemd-timesyncd
 
 # ------------------------------------------------------------------------------
 # SETUP NTP by chrony
-- name: "UPDATER | time-sync | check if service chrony installed"
-  become: true
-  ansible.builtin.stat:
-    path: /etc/init.d/chrony
-  register: chrony_exist
-  tags:
-    - install_client
-    - chrony
-
 - name: "UPDATER | time-sync | add/change /etc/chrony/chrony.conf"
   become: true
   ansible.builtin.template:
@@ -94,10 +85,10 @@
     group: root
   register: chrony_updated
   when:
-    - chrony_exist.stat is defined
-    - chrony_exist.stat.exists | bool
+    - updater_ntp_serivce_use_time_synchronization_service == "chrony"
   tags:
     - updater
+    - time-sync
     - chrony
 
 - name: "UPDATER | time-sync | restart chrony"
@@ -111,5 +102,6 @@
     - chrony_updated.changed is defined
     - chrony_updated.changed | bool
   tags:
-    - install_client
+    - updater
+    - time-sync
     - chrony

@@ -2,7 +2,7 @@
 # tasks file for ./roles/updater
 
 # ------------------------------------------------------------------------------
-- name: "UPDATER | time-zone | check for line in /etc/timezone with {{ updater_time_timezone }}"
+- name: "UPDATER | time-zone | check line defined in /etc/timezone"
   ansible.builtin.lineinfile:
     line: "{{ updater_time_timezone }}"
     path: /etc/timezone
@@ -12,7 +12,7 @@
     - updater
     - timezone
 
-- name: "UPDATER | time-zone | update /etc/timezone with {{ updater_time_timezone }}"
+- name: "UPDATER | time-zone | update /etc/timezone"
   become: true
   ansible.builtin.copy:
     content: "{{ updater_time_timezone }}"
@@ -31,7 +31,7 @@
 - name: "UPDATER | time-zone | remove /etc/localtime"
   become: true
   ansible.builtin.file:
-    path: "/etc/localtime"
+    path: /etc/localtime
     state: absent
   when:
     - timezone_changed is defined
