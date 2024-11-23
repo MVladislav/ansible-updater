@@ -38,13 +38,12 @@ Unattended-Upgrade::Package-Blacklist {
 {% endfor %}
 };
 
-{% if not updater_unattended_autofix_interrupted_dpkg %}
 // This option allows you to control if on a unclean dpkg exit
 // unattended-upgrades will automatically run
 //   dpkg --force-confold --configure -a
 // The default is true, to ensure updates keep getting installed
-Unattended-Upgrade::AutoFixInterruptedDpkg "false";
-{% endif %}
+Unattended-Upgrade::AutoFixInterruptedDpkg "{{ updater_unattended_autofix_interrupted_dpkg | lower }}";
+
 
 // Split the upgrade into the smallest possible chunks so that
 // they can be interrupted with SIGUSR1. This makes the upgrade
@@ -52,43 +51,34 @@ Unattended-Upgrade::AutoFixInterruptedDpkg "false";
 // is running is possible (with a small delay)
 Unattended-Upgrade::MinimalSteps "{{ updater_unattended_minimal_steps | lower }}";
 
-{% if updater_unattended_install_on_shutdown %}
 // Install all unattended-upgrades when the machine is shutting down
 // instead of doing it in the background while the machine is running
 // This will (obviously) make shutdown slower
-Unattended-Upgrade::InstallOnShutdown "true";
-{% endif %}
+Unattended-Upgrade::InstallOnShutdown "{{ updater_unattended_install_on_shutdown | lower }}";
 
 {% if updater_unattended_mail %}
 // Send email to this address for problems or packages upgrades
 // If empty or unset then no email is sent, make sure that you
 // have a working mail setup on your system. A package that provides
 // 'mailx' must be installed.
-Unattended-Upgrade::Mail "{{updater_unattended_mail}}";
+Unattended-Upgrade::Mail "{{ updater_unattended_mail }}";
 {% endif %}
 
-{% if updater_unattended_mail_only_on_error %}
 // Set this value to "true" to get emails only on errors. Default
 // is to always send a mail if Unattended-Upgrade::Mail is set
-Unattended-Upgrade::MailOnlyOnError "true";
-{% endif %}
+Unattended-Upgrade::MailOnlyOnError "{{ updater_unattended_mail_only_on_error | lower }}";
 
-{% if updater_unattended_remove_unused_dependencies %}
 // Do automatic removal of all unused dependencies after the upgrade
 // (equivalent to apt-get autoremove)
-Unattended-Upgrade::Remove-Unused-Dependencies "true";
-{% endif %}
+Unattended-Upgrade::Remove-Unused-Dependencies "{{ updater_unattended_remove_unused_dependencies | lower }}";
 
-{% if not updater_unattended_remove_new_unused_dependencies %}
 // Do automatic removal of new unused dependencies after the upgrade
-Unattended-Upgrade::Remove-New-Unused-Dependencies "false";
-{% endif %}
+Unattended-Upgrade::Remove-New-Unused-Dependencies "{{ updater_unattended_remove_new_unused_dependencies | lower }}";
 
-{% if updater_unattended_automatic_reboot %}
 // Automatically reboot *WITHOUT CONFIRMATION* if a
 // the file /var/run/reboot-required is found after the upgrade
-Unattended-Upgrade::Automatic-Reboot "true";
-{% endif %}
+Unattended-Upgrade::Automatic-Reboot "{{ updater_unattended_automatic_reboot | lower }}";
+Unattended-Upgrade::Automatic-Reboot-WithUsers "{{ updater_unattended_automatic_reboot_with_users | lower }}";
 
 {% if updater_unattended_automatic_reboot_time %}
 // If automatic reboot is enabled and needed, reboot at the specific
@@ -106,22 +96,17 @@ Unattended-Upgrade::Automatic-Reboot-Time "{{ updater_unattended_automatic_reboo
 Unattended-Upgrade::Update-Days {{ updater_unattended_update_days }};
 {% endif %}
 
-{% if updater_unattended_ignore_apps_require_restart %}
 // Do upgrade application even if it requires restart after upgrade
 // I.e. "XB-Upgrade-Requires: app-restart" is set in the debian/control file
-Unattended-Upgrade::IgnoreAppsRequireRestart "true";
-{% endif %}
+Unattended-Upgrade::IgnoreAppsRequireRestart "{{ updater_unattended_ignore_apps_require_restart | lower }}";
 
-{% if updater_unattended_syslog_enable %}
 // Write events to syslog, which is useful in environments where syslog
 // messages are sent to a central store.
-Unattended-Upgrade::SyslogEnable "{{ updater_unattended_syslog_enable }}";
+Unattended-Upgrade::SyslogEnable "{{ updater_unattended_syslog_enable | lower }}";
 {% if updater_unattended_syslog_facility is defined %}
-// Write events to the specified syslog facility, or the daemon facility
-// if not specified. Requires the Unattended-Upgrade::SyslogEnable option
-// to be set to true.
+// Write events to the specified syslog facility, or the daemon facility if not specified.
+// Requires the Unattended-Upgrade::SyslogEnable option to be set to true.
 Unattended-Upgrade::SyslogFacility "{{ updater_unattended_syslog_facility }}";
-{% endif %}
 {% endif %}
 
 {% if updater_unattended_dpkg_options %}
@@ -141,6 +126,6 @@ Acquire::http::Dl-Limit "{{ updater_unattended_dl_limit }}";
 
 // Download and install upgrades only on AC power
 // (i.e. skip or gracefully stop updates on battery)
-Unattended-Upgrade::OnlyOnACPower "{{ updater_unattended_only_on_ac_power }}";
+Unattended-Upgrade::OnlyOnACPower "{{ updater_unattended_only_on_ac_power | lower }}";
 
 Unattended-Upgrade::DevRelease "auto";

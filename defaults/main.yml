@@ -90,7 +90,7 @@ updater_unattended_install_on_shutdown: false
 # have a working mail setup on your system. A package that provides
 # 'mailx' must be installed.
 # can be set to "root" or any mail address
-updater_unattended_mail: false
+updater_unattended_mail: false # false | root | <E-MAIL>
 
 # -> Unattended-Upgrade::MailOnlyOnError
 # Set this value to "true" to get emails only on errors. Default
@@ -100,7 +100,7 @@ updater_unattended_mail_only_on_error: false
 # -> Unattended-Upgrade::Remove-Unused-Dependencies
 # Do automatic removal of all unused dependencies after the upgrade
 # (equivalent to apt-get autoremove)
-updater_unattended_remove_unused_dependencies: false
+updater_unattended_remove_unused_dependencies: true
 
 # -> Unattended-Upgrade::Remove-New-Unused-Dependencies
 # Remove any new unused dependencies after the upgrade
@@ -110,11 +110,13 @@ updater_unattended_remove_new_unused_dependencies: true
 # Automatically reboot *WITHOUT CONFIRMATION* if a
 # the file /var/run/reboot-required is found after the upgrade
 updater_unattended_automatic_reboot: false
+updater_unattended_automatic_reboot_with_users: false
 
 # -> Unattended-Upgrade::Automatic-Reboot-Time
 # If automatic reboot is enabled and needed, reboot at the specific
 # time instead of immediately
-updater_unattended_automatic_reboot_time: false
+# set false to not set, or time (default 'now')
+updater_unattended_automatic_reboot_time: false # false | now | 02:00 | ...
 
 # -> Unattended-Upgrade::IgnoreAppsRequireRestart
 # Do upgrade application even if it requires restart after upgrade
