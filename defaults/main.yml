@@ -20,6 +20,7 @@ updater_config:
   update_upgrade: true
   setup_zfs: false
   setup_unattended: true
+  setup_sysctl: true
 
 # ------------------------------------------------------------------------------
 updater_time_timezone: Europe/Berlin

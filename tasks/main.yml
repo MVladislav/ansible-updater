@@ -93,3 +93,11 @@
   when:
     - updater_config.setup_unattended is defined
     - updater_config.setup_unattended | bool
+
+# ------------------------------------------------------------------------------
+# SETUP SYSCTL
+- name: "UPDATER | sysctl | setup sysctl"
+  ansible.builtin.include_tasks: set_sysctl.yml
+  when:
+    - updater_config.setup_sysctl is defined
+    - updater_config.setup_sysctl | bool

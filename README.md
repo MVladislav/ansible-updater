@@ -36,6 +36,7 @@ updater_config:
   update_upgrade: true
   setup_zfs: false
   setup_unattended: true
+  setup_sysctl: true
 
 updater_time_timezone: Europe/Berlin
 
@@ -81,6 +82,7 @@ Example how to use:
         update_upgrade: true
         setup_zfs: true
         setup_unattended: true
+        setup_sysctl: true
       # define your timezone
       updater_time_timezone: Europe/Berlin
       # set ntp servers
