@@ -19,11 +19,16 @@
 
 # ------------------------------------------------------------------------------
 # SET TIMEZONE
-- name: "UPDATER | time-zone | set timezone"
-  ansible.builtin.include_tasks: set_timezone.yml
+- name: "UPDATER | time-zone | set system timezone"
+  become: true
+  community.general.timezone:
+    name: "{{ updater_time_timezone }}"
   when:
     - updater_config.set_timezone is defined
     - updater_config.set_timezone | bool
+  tags:
+    - updater
+    - timezone
 
 # SET TIME SYNC
 - name: "UPDATER | time-sync | set time sync"
@@ -32,6 +37,7 @@
     - updater_config.set_time_sync is defined
     - updater_config.set_time_sync | bool
 
+# ------------------------------------------------------------------------------
 # SET LANGUAGE
 - name: "UPDATER | lang | set language"
   ansible.builtin.include_tasks: set_language.yml

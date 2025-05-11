@@ -7,30 +7,27 @@
     'language-pack-*' and 'language-pack-*-base' with * as defined
   become: true
   ansible.builtin.apt:
-    name: "{{ item }}"
+    name:
+      - "language-pack-{{ outer_item.locale.split('_')[0] }}"
+      - "language-pack-{{ outer_item.locale.split('_')[0] }}-base"
+      - "language-pack-gnome-{{ outer_item.locale.split('_')[0] }}"
+      - "language-pack-gnome-{{ outer_item.locale.split('_')[0] }}-base"
     state: present
     force_apt_get: true # apt-get instead of aptitude
     update_cache: true
-  with_items:
-    - "language-pack-{{ outer_item.locale.split('_')[0] }}"
-    - "language-pack-{{ outer_item.locale.split('_')[0] }}-base"
-    - "language-pack-gnome-{{ outer_item.locale.split('_')[0] }}"
-    - "language-pack-gnome-{{ outer_item.locale.split('_')[0] }}-base"
-  register: locale_languages
+  register: updater_chg_user_locale_languages
   when: outer_item.locale is defined
   tags:
     - updater
-    - system_local
     - system_local_user
 
 - name: "UPDATER | lang | ensure dpkg is reconfigured"
   become: true
   ansible.builtin.command: dpkg-reconfigure locales -f noninteractive
   changed_when: false
-  when: locale_languages is defined and locale_languages.changed
+  when: updater_chg_user_locale_languages is defined and updater_chg_user_locale_languages.changed
   tags:
     - updater
-    - system_local
     - system_local_user
 
 # ------------------------------------------------------------------------------
@@ -41,7 +38,6 @@
     state: present
   tags:
     - updater
-    - system_local
     - system_local_user
 
 - name: "UPDATER | lang | ensure localization files for specified language are available"
@@ -51,7 +47,6 @@
     state: present
   tags:
     - updater
-    - system_local
     - system_local_user
 
 # ------------------------------------------------------------------------------
@@ -63,18 +58,19 @@
   changed_when: false
   tags:
     - updater
-    - system_local
     - system_local_user
 
 - name: "UPDATER | lang | parse 'LANG' from current locale and language configuration"
   become: true
   become_user: "{{ outer_item.name }}"
   ansible.builtin.set_fact:
-    locale_lang: "{{ locale_status.stdout | regex_search('LANG=([^\n]+)', '\\1') | first }}"
-  when: locale_status is defined and locale_status.stdout is defined
+    locale_lang: "{{ locale_status.stdout | regex_search('LANG=([^\n]+)', '\\1') | default([''], true) | first }}"
+  when:
+    - locale_status is defined
+    - locale_status.stdout is defined
+    - locale_status.stdout | length > 0
   tags:
     - updater
-    - system_local
     - system_local_user
 
 - name: "UPDATER | lang | parse 'LANGUAGE' from current locale and language configuration"
@@ -82,10 +78,12 @@
   become_user: "{{ outer_item.name }}"
   ansible.builtin.set_fact:
     locale_language: "{{ locale_status.stdout | regex_search('LANGUAGE=([^\n]+)', '\\1') | default([locale_lang], true) | first }}"
-  when: locale_status is defined and locale_status.stdout is defined
+  when:
+    - locale_status is defined
+    - locale_status.stdout is defined
+    - locale_status.stdout | length > 0
   tags:
     - updater
-    - system_local
     - system_local_user
 
 # ------------------------------------------------------------------------------
@@ -99,6 +97,9 @@
     group: "{{ outer_item.name }}"
     owner: "{{ outer_item.name }}"
     mode: "0660"
+  tags:
+    - updater
+    - system_local_user
 
 - name: "UPDATER | lang | set language env variables in '~/.pam_environment'"
   become: true
@@ -139,7 +140,6 @@
       value: "DEFAULT=a4"
   tags:
     - updater
-    - system_local
     - system_local_user
 
 - name: "UPDATER | lang | remove conf file for user-dirs.* and recreate"
@@ -152,7 +152,6 @@
   failed_when: language_rm_user_dirs.rc is defined and language_rm_user_dirs.rc == 999
   tags:
     - updater
-    - system_local
     - system_local_user
 
 # ------------------------------------------------------------------------------
@@ -163,5 +162,4 @@
   when: locale_lang != outer_item.locale or locale_language != outer_item.language
   tags:
     - updater
-    - system_local
     - system_local_user

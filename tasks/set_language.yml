@@ -7,16 +7,15 @@
     'language-pack-*' and 'language-pack-*-base' with * as defined
   become: true
   ansible.builtin.apt:
-    pkg: "{{ item }}"
+    name:
+      - "language-pack-{{ updater_config_system_locale.split('_')[0] }}"
+      - "language-pack-{{ updater_config_system_locale.split('_')[0] }}-base"
+      - "language-pack-gnome-{{ updater_config_system_locale.split('_')[0] }}"
+      - "language-pack-gnome-{{ updater_config_system_locale.split('_')[0] }}-base"
     state: present
     force_apt_get: true # apt-get instead of aptitude
     update_cache: true
-  with_items:
-    - "language-pack-{{ updater_config_system_locale.split('_')[0] }}"
-    - "language-pack-{{ updater_config_system_locale.split('_')[0] }}-base"
-    - "language-pack-gnome-{{ updater_config_system_locale.split('_')[0] }}"
-    - "language-pack-gnome-{{ updater_config_system_locale.split('_')[0] }}-base"
-  register: locale_languages
+  register: updater_chg_locale_languages
   when: outer_item.locale is defined
   tags:
     - updater
@@ -26,26 +25,21 @@
   become: true
   ansible.builtin.command: dpkg-reconfigure locales -f noninteractive
   changed_when: false
-  when: locale_languages is defined and locale_languages.changed
+  when: updater_chg_locale_languages is defined and updater_chg_locale_languages.changed
   tags:
     - updater
     - system_local
 
 # ------------------------------------------------------------------------------
-- name: "UPDATER | lang | ensure localization files are available for system local"
+- name: "UPDATER | lang | generate system locales"
   become: true
   community.general.locale_gen:
-    name: "{{ updater_config_system_locale }}"
+    name: "{{ item }}"
     state: present
-  tags:
-    - updater
-    - system_local
-
-- name: "UPDATER | lang | ensure localization files are available for system language"
-  become: true
-  community.general.locale_gen:
-    name: "{{ updater_config_system_language }}"
-    state: present
+  loop:
+    - "{{ updater_config_system_locale }}"
+    - "{{ updater_config_system_language }}"
+  register: updater_chg_gen_locales
   tags:
     - updater
     - system_local
@@ -53,14 +47,13 @@
 # ------------------------------------------------------------------------------
 - name: "UPDATER | lang | get current locale and language configuration"
   become: true
-  ansible.builtin.command: localectl status
+  ansible.builtin.command: locale
   register: locale_status
   changed_when: false
   tags:
     - updater
     - system_local
 
-# ------------------------------------------------------------------------------
 - name: "UPDATER | lang | parse 'LANG' from current locale and language configuration"
   become: true
   ansible.builtin.set_fact:
