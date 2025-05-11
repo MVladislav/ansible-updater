@@ -206,43 +206,68 @@ net.bridge.bridge-nf-call-iptables=0
 net.bridge.bridge-nf-call-arptables=0
 net.bridge.bridge-nf-call-ip6tables=0
 
+# IPv6 Privacy Extensions (RFC 4941)
+# ---
+# IPv6 typically uses a device's MAC address when choosing an IPv6 address
+# to use in autoconfiguration. Privacy extensions allow using a randomly
+# generated IPv6 address, which increases privacy.
+#
+# Acceptable values:
+#    0 - don’t use privacy extensions.
+#    1 - generate privacy addresses
+#    2 - prefer privacy addresses and use them over the normal addresses.
+net.ipv6.conf.all.use_tempaddr=2
+net.ipv6.conf.default.use_tempaddr=2
+
+# Set preferred lifetime to 1 hour (time before a new address is preferred)
+# Backuped optional values: 86400 (24h)
+net.ipv6.conf.all.temp_prefered_lft=3600
+net.ipv6.conf.default.temp_prefered_lft=3600
+# Set valid lifetime to 2 hours (time before the old address is invalidated)
+# Backuped optional values: 604800 (168h)
+net.ipv6.conf.all.temp_valid_lft=7200
+net.ipv6.conf.default.temp_valid_lft=7200
+
 ###################################################################
 # ==> Networking (Performance Parameters)
 
 # Increase maximum receive/send socket buffer sizes for handling large data streams.
-# Backuped optional values: 67108864 | 134217728
+# Backuped optional values: 212992 | 67108864 | 134217728
 net.core.rmem_max=134217728
 net.core.wmem_max=134217728
 
 # Increase input queue size for better handling of high traffic volumes.
 # Backuped optional values: 1000 | 3000
-net.core.netdev_max_backlog=1000
+#net.core.netdev_max_backlog=1000
 
 # Increase maximum number of pending connections to support high traffic loads.
 # Backuped optional values: 4096 | 65535
-net.core.somaxconn=4096
+#net.core.somaxconn=4096
 
 # Number of flow entries for Receive Packet Steering (RPS).
-net.core.rps_sock_flow_entries=32768
+# Backuped optional values: 0 | 32768
+#net.core.rps_sock_flow_entries=32768
 
 # Optimize TCP buffers for high throughput connections (low, pressure, high).
-# Backuped optional values: 67108864 | 134217728
-net.ipv4.tcp_rmem=4096 87380 134217728
-net.ipv4.tcp_wmem=4096 87380 134217728
+# Backuped optional values: 4096 131072 6291456 | 4096 87380 67108864 | 4096 87380 134217728
+#net.ipv4.tcp_rmem=4096 87380 134217728
+# Backuped optional values: 4096 16384 4194304 | 4096 87380 67108864 | 4096 87380 134217728
+#net.ipv4.tcp_wmem=4096 87380 134217728
 
 # Maximum number of queued SYN requests, higher values prevent SYN flood attacks.
-net.ipv4.tcp_max_syn_backlog=4096
+# Backuped optional values: 512 | 4096
+#net.ipv4.tcp_max_syn_backlog=4096
 
 # Define memory pressure thresholds for TCP memory management (low, pressure, high).
-# Backuped optional values: 4194304 4194304 4194304
-net.ipv4.tcp_mem=8388608 12582912 16777216
+# Backuped optional values: 93222 124299 186444 | 4194304 4194304 4194304 | 8388608 12582912 16777216
+#net.ipv4.tcp_mem=8388608 12582912 16777216
 
 ###################################################################
 # ==> Filesystem Parameters
 
 # Increase maximum number of open file descriptors system-wide, supporting applications with many files open.
-# Backuped optional values: 2097152 | 262144 | 4194304
-fs.file-max=2097152
+# Backuped optional values: 2097152 | 262144 | 4194304 | 9223372036854775807
+fs.file-max=9223372036854775807
 
 # Increase maximum virtual memory map count for applications using large amounts of virtual memory.
 vm.max_map_count=1048576
@@ -268,6 +293,10 @@ vm.max_map_count=1048576
 #net.ipv4.ip_forward=1
 #net.ipv4.conf.all.forwarding=1
 #net.ipv6.conf.all.forwarding=1
+
+# ###################################################################
+# Enable over commit memory, example for valkey (if installed and required)
+#vm.overcommit_memory=1
 
 ###################################################################
 # Optional changes for further performance tuning or alternative configurations:
