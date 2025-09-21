@@ -8,8 +8,8 @@ APT::Periodic::Unattended-Upgrade "1";
 APT::Periodic::Update-Package-Lists "{{updater_unattended_update_package_list}}";
 {% endif %}
 
-{% if updater_unattended_download_upgradeable is defined %}
-APT::Periodic::Download-Upgradeable-Packages "{{updater_unattended_download_upgradeable}}";
+{% if updater_unattended_download_upgradeable_packages is defined %}
+APT::Periodic::Download-Upgradeable-Packages "{{updater_unattended_download_upgradeable_packages}}";
 {% endif %}
 
 {% if updater_unattended_autoclean_interval is defined %}

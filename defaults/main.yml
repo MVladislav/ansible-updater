@@ -133,7 +133,7 @@ updater_unattended_syslog_enable: false
 # Write events to the specified syslog facility, or the daemon facility if
 # not specified. Requires the Unattended-Upgrade::SyslogEnable option to be
 # set to true.
-# -> unattended_syslog_facility: "daemon"
+# -> updater_unattended_syslog_facility: "daemon"
 
 ### APT::Periodic configuration
 # Snatched from /usr/lib/apt/apt.systemd.daily
@@ -144,7 +144,7 @@ updater_unattended_update_package_list: 1
 
 # -> APT::Periodic::Download-Upgradeable-Packages "0";
 # - Do "apt-get upgrade --download-only" every n-days (0=disable)
-# -> unattended_download_upgradeable: 0
+# -> updater_unattended_download_upgradeable_packages: 0
 
 # -> APT::Periodic::AutocleanInterval "0";
 # - Do "apt-get autoclean" every n-days (0=disable)
@@ -152,7 +152,7 @@ updater_unattended_autoclean_interval: 7
 
 # -> APT::Periodic::CleanInterval "0";
 # - Do "apt-get clean" every n-days (0=disable)
-# -> unattended_clean_interval: 0
+# -> updater_unattended_clean_interval: 0
 
 # -> APT::Periodic::Verbose "0";
 # - Send report mail to root
@@ -160,7 +160,7 @@ updater_unattended_autoclean_interval: 7
 #     1:  progress report       (actually any string)
 #     2:  + command outputs     (remove -qq, remove 2>/dev/null, add -d)
 #     3:  + trace on
-# -> unattended_verbose: 0
+# -> updater_unattended_verbose: 0
 
 ## Cron systems only
 
@@ -171,7 +171,7 @@ updater_unattended_autoclean_interval: 7
 # minutes (1800 seconds) so that the mirror servers are not crushed by
 # everyone running their updates all at the same time
 # Kept undefined to allow default (1800)
-# -> unattended_random_sleep: 0
+# -> updater_unattended_random_sleep: 0
 
 # -> Dpkg::Options
 # Provide dpkg options that take effect during unattended upgrades.
@@ -186,7 +186,7 @@ updater_unattended_dpkg_options: []
 #   - "--force-confold"
 
 # Use apt bandwidth limit feature, this example limits the download speed to 70kb/sec
-# -> unattended_dl_limit: 70
+# -> updater_unattended_dl_limit: 70
 
 # Unattended-Upgrade::OnlyOnACPower
 # Download and install upgrades only on AC power
