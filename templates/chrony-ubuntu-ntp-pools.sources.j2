@@ -1,0 +1,28 @@
+{{ ansible_managed | comment }}
+
+# Main NTP server (always prefer this one)
+{% if updater_ntp_server_use_nts | default(false) %}
+server {{ updater_ntp_server }} iburst nts prefer
+{% else %}
+server {{ updater_ntp_server }} iburst prefer
+{% endif %}
+
+# Fallback NTP server (never use prefer)
+{% if updater_ntp_fallback_server_use_nts | default(false) %}
+server {{ updater_ntp_fallback_server }} iburst nts
+{% else %}
+server {{ updater_ntp_fallback_server }} iburst
+{% endif %}
+
+# Use NTS by default
+# NTS uses an additional port to negotiate security: 4460/tcp
+# The normal NTP port remains in use: 123/udp
+## pool 1.ntp.ubuntu.com iburst maxsources 1 nts prefer
+## pool 2.ntp.ubuntu.com iburst maxsources 1 nts prefer
+## pool 3.ntp.ubuntu.com iburst maxsources 1 nts prefer
+## pool 4.ntp.ubuntu.com iburst maxsources 1 nts prefer
+
+# The bootstrap server is needed by systems without a hardware clock, or a very
+# large initial clock offset. The specified certificate set is defined in
+# /etc/chrony/conf.d/ubuntu-nts.conf.
+## pool ntp-bootstrap.ubuntu.com iburst maxsources 1 nts certset 1

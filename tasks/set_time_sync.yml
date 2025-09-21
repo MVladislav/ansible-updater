@@ -90,6 +90,21 @@
     - time-sync
     - chrony
 
+- name: "UPDATER | time-sync | deploy chrony config '/etc/chrony/sources.d/ubuntu-ntp-pools.sources'"
+  become: true
+  ansible.builtin.template:
+    src: chrony-ubuntu-ntp-pools.sources.j2
+    dest: /etc/chrony/sources.d/ubuntu-ntp-pools.sources
+    owner: root
+    group: root
+    mode: "0644"
+  when:
+    - updater_ntp_serivce_use_time_synchronization_service == "chrony"
+  tags:
+    - updater
+    - time-sync
+    - chrony
+
 - name: "UPDATER | time-sync | restart chrony"
   become: true
   ansible.builtin.systemd_service:

@@ -27,7 +27,9 @@ updater_time_timezone: Europe/Berlin
 
 # ------------------------------------------------------------------------------
 updater_ntp_serivce_use_time_synchronization_service: chrony # chrony | systemd-timesyncd
+updater_ntp_server_use_nts: false
 updater_ntp_server: time.cloudflare.com
+updater_ntp_fallback_server_use_nts: false
 updater_ntp_fallback_server: ntp.ubuntu.com
 
 # ------------------------------------------------------------------------------
