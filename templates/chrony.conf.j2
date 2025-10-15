@@ -43,8 +43,8 @@ makestep 1 3
 # Get TAI-UTC offset and leap seconds from the system tz database.
 # This directive must be commented out when using time sources serving
 # leap-smeared time.
-leapseclist /usr/share/zoneinfo/leap-seconds.list
-# leapsecmode slew
+# leapseclist /usr/share/zoneinfo/leap-seconds.list
+leapsecmode slew
 
 # Include configuration files found in /etc/chrony/conf.d.
 confdir /etc/chrony/conf.d
