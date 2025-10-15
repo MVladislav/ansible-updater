@@ -1,31 +1,46 @@
 ---
 # tasks file for ./roles/updater
 
-- name: "UPDATER | zfs | creating and setup /etc/modprobe.d/zfs.conf"
+- name: "UPDATER | zfs | get root filesystem type"
+  ansible.builtin.command: findmnt -n -o FSTYPE /
+  register: updater_root_fstype
+  changed_when: false
+  tags:
+    - updater
+    - zfs
+
+- name: "UPDATER | zfs | calculate physical memory in bytes"
   become: true
   ansible.builtin.shell: >
     set -o pipefail &&
     echo $(($(getconf _PHYS_PAGES) * $(getconf PAGE_SIZE)))
   args:
     executable: /bin/bash
-  register: node_memory_size
-  changed_when: node_memory_size is defined and node_memory_size.rc != 0
+  register: updater_node_memory_size
+  changed_when:
+    - updater_node_memory_size is defined
+    - updater_node_memory_size.rc != 0
+  when:
+    - updater_root_fstype.stdout is defined
+    - updater_root_fstype.stdout == "zfs"
   tags:
     - updater
     - zfs
 
-- name: "UPDATER | zfs | creating and setup /etc/modprobe.d/zfs.conf"
+- name: "UPDATER | zfs | write /etc/modprobe.d/zfs.conf"
   become: true
   ansible.builtin.copy:
     dest: /etc/modprobe.d/zfs.conf
     content: |
-      options zfs zfs_arc_min={{ ((node_memory_size.stdout | int / 4)) | round | int }}
-      options zfs zfs_arc_max={{ ((node_memory_size.stdout | int / 1.2)) | round | int }}
+      options zfs zfs_arc_min={{ ((updater_node_memory_size.stdout | int / 4)) | round | int }}
+      options zfs zfs_arc_max={{ ((updater_node_memory_size.stdout | int / 1.2)) | round | int }}
     mode: "0644"
-  register: zfs_changes
+  register: updater_zfs_changes
   when:
-    - node_memory_size is defined
-    - node_memory_size.stdout is defined
+    - updater_root_fstype.stdout is defined
+    - updater_root_fstype.stdout == "zfs"
+    - updater_node_memory_size is defined
+    - updater_node_memory_size.stdout is defined
   tags:
     - updater
     - zfs
@@ -35,9 +50,11 @@
   ansible.builtin.command: update-initramfs -u
   changed_when: true
   when:
-    - zfs_changes is defined
-    - zfs_changes.changed is defined
-    - zfs_changes.changed | bool
+    - updater_root_fstype.stdout is defined
+    - updater_root_fstype.stdout == "zfs"
+    - updater_zfs_changes is defined
+    - updater_zfs_changes.changed is defined
+    - updater_zfs_changes.changed | bool
   tags:
     - updater
     - zfs
