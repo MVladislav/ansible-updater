@@ -119,3 +119,4 @@
     - updater
     - time-sync
     - chrony
+    - molecule-idempotence-notest
