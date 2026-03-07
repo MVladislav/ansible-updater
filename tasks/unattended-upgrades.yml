@@ -18,7 +18,7 @@
 
 # ------------------------------------------------------------------------------
 - name: "UPDATER | unattended | add distribution-specific variables"
-  ansible.builtin.include_vars: "{{ ansible_distribution }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_facts['distribution'] }}.yml"
   tags:
     - updater
     - unattended_upgrades

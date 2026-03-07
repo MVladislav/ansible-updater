@@ -139,6 +139,9 @@ net.ipv4.icmp_ignore_bogus_error_responses=1
 net.ipv4.icmp_echo_ignore_all=0
 
 # Enable source address validation to prevent spoofing.
+# - 0: off    :: Disabled - no reverse path filtering. Allows asymmetric routing.
+# - 1: loose  :: Accepts packets if any local route matches source IP (most permissive).
+# - 2: strict :: Accepts only if exact interface/route matches expected path (default, most secure).
 net.ipv4.conf.all.rp_filter=1
 net.ipv4.conf.default.rp_filter=1
 net.ipv4.conf.lo.rp_filter=0
@@ -157,10 +160,6 @@ net.ipv4.tcp_timestamps=0
 
 # Protect Against TCP Time-Wait to mitigate DoS attack attempts.
 net.ipv4.tcp_rfc1337=1
-
-# Enable temporary IPv6 addresses for better privacy (anonymizing address information).
-net.ipv6.conf.all.use_tempaddr=2
-net.ipv6.conf.default.use_tempaddr=2
 
 # Enable source address verification for IPv6.
 # This makes it more difficult for an attacker to spoof their IP address

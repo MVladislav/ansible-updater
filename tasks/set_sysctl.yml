@@ -11,7 +11,7 @@
   register: tunning_network_result
   tags:
     - updater
-    - apt
+    - sysctl
 
 - name: "UPDATER | sysctl | init tunning's step:: run 'sysctl -p --system'"
   become: true
@@ -21,7 +21,47 @@
     - tunning_network_result is defined
     - tunning_network_result.changed is defined
     - tunning_network_result.changed | bool
-    - ansible_virtualization_type != "docker"
+    - ansible_facts['virtualization_type'] != "docker"
   tags:
     - updater
-    - apt
+    - sysctl
+
+- name: "UPDATER | sysctl | create sysctl-resume.service"
+  become: true
+  ansible.builtin.copy:
+    content: |
+      [Unit]
+      Description=Reapply sysctl settings after resume
+      After=suspend.target sleep.target hibernate.target hybrid-sleep.target
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/sbin/sysctl -p --system
+
+      [Install]
+      WantedBy=suspend.target
+      WantedBy=hibernate.target
+      WantedBy=hybrid-sleep.target
+      WantedBy=sleep.target
+    dest: "/etc/systemd/system/sysctl-resume.service"
+    mode: "0644"
+  register: sysctl_service_result
+  tags:
+    - updater
+    - sysctl
+
+- name: "UPDATER | sysctl | enable sysctl-resume.service"
+  become: true
+  ansible.builtin.systemd_service:
+    name: sysctl-resume.service
+    daemon_reload: true
+    enabled: true
+    masked: false
+    state: started
+  when:
+    - sysctl_service_result is defined
+    - sysctl_service_result.changed is defined
+    - sysctl_service_result.changed | bool
+  tags:
+    - updater
+    - sysctl
