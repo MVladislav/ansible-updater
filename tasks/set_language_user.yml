@@ -2,55 +2,68 @@
 # tasks file for ./roles/updater
 
 # ------------------------------------------------------------------------------
-- name: >
-    UPDATER | lang | ensure language packages are installed for
-    'language-pack-*' and 'language-pack-*-base' with * as defined
+- name: "UPDATER | lang-user | prepare language parts"
+  ansible.builtin.set_fact:
+    # updater_locale_user_base: "{{ outer_item.locale.split('.')[0] | default('en_US') }}"
+    updater_locale_user_lang: "{{ outer_item.locale.split('.')[0].split('_')[0] | default('en') | lower }}"
+    # updater_locale_user_country: "{{ outer_item.locale.split('.')[0].split('_')[1] | default('us') | lower }}"
+  when: outer_item.locale is defined
+  tags:
+    - updater
+    - system_locale_user
+
+- name: "UPDATER | lang-user | ensure language packages are installed"
   become: true
   ansible.builtin.apt:
     name:
-      - "language-pack-{{ outer_item.locale.split('_')[0] }}"
-      - "language-pack-{{ outer_item.locale.split('_')[0] }}-base"
-      - "language-pack-gnome-{{ outer_item.locale.split('_')[0] }}"
-      - "language-pack-gnome-{{ outer_item.locale.split('_')[0] }}-base"
+      - "language-pack-{{ updater_locale_user_lang }}"
+      - "language-pack-{{ updater_locale_user_lang }}-base"
+      - "language-pack-gnome-{{ updater_locale_user_lang }}"
+      - "language-pack-gnome-{{ updater_locale_user_lang }}-base"
+      - "gnome-user-docs-{{ updater_locale_user_lang }}"
+      - "hunspell-{{ updater_locale_user_lang }}-*-frami"
     state: present
     force_apt_get: true # apt-get instead of aptitude
     update_cache: true
   register: updater_chg_user_locale_languages
-  when: outer_item.locale is defined
+  when:
+    - outer_item.locale is defined
+    - updater_locale_user_lang != 'en'
   tags:
     - updater
-    - system_local_user
+    - system_locale_user
 
-- name: "UPDATER | lang | ensure dpkg is reconfigured"
+# ------------------------------------------------------------------------------
+- name: "UPDATER | lang-user | ensure dpkg is reconfigured"
   become: true
   ansible.builtin.command: dpkg-reconfigure locales -f noninteractive
   changed_when: false
   when: updater_chg_user_locale_languages is defined and updater_chg_user_locale_languages.changed
   tags:
     - updater
-    - system_local_user
+    - system_locale_user
 
 # ------------------------------------------------------------------------------
-- name: "UPDATER | lang | ensure localization files for specified language are available"
+- name: "UPDATER | lang-user | ensure localization files for specified language are available"
   become: true
   community.general.locale_gen:
     name: "{{ outer_item.locale }}"
     state: present
   tags:
     - updater
-    - system_local_user
+    - system_locale_user
 
-- name: "UPDATER | lang | ensure localization files for specified language are available"
+- name: "UPDATER | lang-user | ensure localization files for specified language are available"
   become: true
   community.general.locale_gen:
     name: "{{ outer_item.language }}"
     state: present
   tags:
     - updater
-    - system_local_user
+    - system_locale_user
 
 # ------------------------------------------------------------------------------
-- name: "UPDATER | lang | get current locale and language configuration"
+- name: "UPDATER | lang-user | get current locale and language configuration"
   become: true
   become_user: "{{ outer_item.name }}"
   ansible.builtin.command: locale
@@ -58,9 +71,9 @@
   changed_when: false
   tags:
     - updater
-    - system_local_user
+    - system_locale_user
 
-- name: "UPDATER | lang | parse 'LANG' from current locale and language configuration"
+- name: "UPDATER | lang-user | parse 'LANG' from current locale and language configuration"
   become: true
   become_user: "{{ outer_item.name }}"
   ansible.builtin.set_fact:
@@ -71,9 +84,9 @@
     - locale_status.stdout | length > 0
   tags:
     - updater
-    - system_local_user
+    - system_locale_user
 
-- name: "UPDATER | lang | parse 'LANGUAGE' from current locale and language configuration"
+- name: "UPDATER | lang-user | parse 'LANGUAGE' from current locale and language configuration"
   become: true
   become_user: "{{ outer_item.name }}"
   ansible.builtin.set_fact:
@@ -84,10 +97,10 @@
     - locale_status.stdout | length > 0
   tags:
     - updater
-    - system_local_user
+    - system_locale_user
 
 # ------------------------------------------------------------------------------
-- name: "UPDATER | lang | ensure file '~/.pam_environment' exists"
+- name: "UPDATER | lang-user | ensure file '~/.pam_environment' exists"
   become: true
   become_user: "{{ outer_item.name }}"
   ansible.builtin.copy:
@@ -99,9 +112,9 @@
     mode: "0660"
   tags:
     - updater
-    - system_local_user
+    - system_locale_user
 
-- name: "UPDATER | lang | set language env variables in '~/.pam_environment'"
+- name: "UPDATER | lang-user | set language env variables in '~/.pam_environment'"
   become: true
   become_user: "{{ outer_item.name }}"
   ansible.builtin.lineinfile:
@@ -140,9 +153,9 @@
       value: "DEFAULT=a4"
   tags:
     - updater
-    - system_local_user
+    - system_locale_user
 
-- name: "UPDATER | lang | remove conf file for user-dirs.* and recreate"
+- name: "UPDATER | lang-user | remove conf file for user-dirs.* and recreate"
   become: true
   become_user: "{{ outer_item.name }}"
   ansible.builtin.shell: set -o pipefail && rm ~/.config/user-dirs.{dirs,locale} ; xdg-user-dirs-update --force
@@ -152,14 +165,14 @@
   failed_when: language_rm_user_dirs.rc is defined and language_rm_user_dirs.rc == 999
   tags:
     - updater
-    - system_local_user
+    - system_locale_user
 
 # ------------------------------------------------------------------------------
-- name: "UPDATER | lang | ensure dpkg is reconfigured"
+- name: "UPDATER | lang-user | ensure dpkg is reconfigured"
   become: true
   ansible.builtin.command: dpkg-reconfigure locales -f noninteractive
   changed_when: false
   when: locale_lang != outer_item.locale or locale_language != outer_item.language
   tags:
     - updater
-    - system_local_user
+    - system_locale_user

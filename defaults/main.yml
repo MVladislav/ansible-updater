@@ -33,8 +33,6 @@ updater_ntp_fallback_server_use_nts: false
 updater_ntp_fallback_server: ntp.ubuntu.com
 
 # ------------------------------------------------------------------------------
-updater_language_default_pack: en
-
 updater_config_system_locale: en_US.UTF-8
 updater_config_system_language: en_US.UTF-8
 

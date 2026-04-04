@@ -2,25 +2,71 @@
 # tasks file for ./roles/updater
 
 # ------------------------------------------------------------------------------
-- name: >
-    UPDATER | lang | ensure language packages are installed for
-    'language-pack-*' and 'language-pack-*-base' with * as defined
+- name: "UPDATER | lang | prepare language parts"
+  ansible.builtin.set_fact:
+    # updater_locale_system_base: "{{ updater_config_system_language.split('.')[0] | default('en_US') }}"
+    updater_locale_system_lang: "{{ updater_config_system_language.split('.')[0].split('_')[0] | default('en') | lower }}"
+    # updater_locale_system_country: "{{ updater_config_system_language.split('.')[0].split('_')[1] | default('us') | lower }}"
+  tags:
+    - updater
+    - system_locale
+
+- name: "UPDATER | lang | ensure language packages are installed"
   become: true
   ansible.builtin.apt:
     name:
-      - "language-pack-{{ updater_config_system_locale.split('_')[0] }}"
-      - "language-pack-{{ updater_config_system_locale.split('_')[0] }}-base"
-      - "language-pack-gnome-{{ updater_config_system_locale.split('_')[0] }}"
-      - "language-pack-gnome-{{ updater_config_system_locale.split('_')[0] }}-base"
+      - "language-pack-{{ updater_locale_system_lang }}"
+      - "language-pack-{{ updater_locale_system_lang }}-base"
+      - "language-pack-gnome-{{ updater_locale_system_lang }}"
+      - "language-pack-gnome-{{ updater_locale_system_lang }}-base"
+      - "hunspell-{{ updater_locale_system_lang }}-*-frami"
+      - wngerman
+      - wogerman
+      - wswiss
     state: present
     force_apt_get: true # apt-get instead of aptitude
     update_cache: true
   register: updater_chg_locale_languages
-  when: outer_item.locale is defined
+  when: updater_locale_system_lang != 'en'
   tags:
     - updater
-    - system_local
+    - system_locale
 
+- name: "UPDATER | lang | ensure language support is installed ('en')"
+  become: true
+  ansible.builtin.apt:
+    name:
+      - "hunspell-{{ updater_locale_system_lang }}-*"
+      - wngerman
+      - wogerman
+      - wswiss
+    state: present
+    force_apt_get: true # apt-get instead of aptitude
+    update_cache: true
+  register: updater_chg_locale_languages
+  when: updater_locale_system_lang == 'en'
+  tags:
+    - updater
+    - system_locale
+
+- name: "UPDATER | lang | ensure language support is installed (none 'en')"
+  become: true
+  ansible.builtin.apt:
+    name:
+      - "hunspell-{{ updater_locale_system_lang }}-*-frami"
+      - wngerman
+      - wogerman
+      - wswiss
+    state: present
+    force_apt_get: true # apt-get instead of aptitude
+    update_cache: true
+  register: updater_chg_locale_languages
+  when: updater_locale_system_lang != 'en'
+  tags:
+    - updater
+    - system_locale
+
+# ------------------------------------------------------------------------------
 - name: "UPDATER | lang | ensure dpkg is reconfigured"
   become: true
   ansible.builtin.command: dpkg-reconfigure locales -f noninteractive
@@ -28,7 +74,7 @@
   when: updater_chg_locale_languages is defined and updater_chg_locale_languages.changed
   tags:
     - updater
-    - system_local
+    - system_locale
 
 # ------------------------------------------------------------------------------
 - name: "UPDATER | lang | generate system locales"
@@ -42,7 +88,7 @@
   register: updater_chg_gen_locales
   tags:
     - updater
-    - system_local
+    - system_locale
 
 # ------------------------------------------------------------------------------
 - name: "UPDATER | lang | get current locale and language configuration"
@@ -52,7 +98,7 @@
   changed_when: false
   tags:
     - updater
-    - system_local
+    - system_locale
 
 - name: "UPDATER | lang | parse 'LANG' from current locale and language configuration"
   become: true
@@ -64,7 +110,7 @@
     - locale_status.stdout | length > 0
   tags:
     - updater
-    - system_local
+    - system_locale
 
 - name: "UPDATER | lang | parse 'LANGUAGE' from current locale and language configuration"
   become: true
@@ -76,7 +122,7 @@
     - locale_status.stdout | length > 0
   tags:
     - updater
-    - system_local
+    - system_locale
 
 # ------------------------------------------------------------------------------
 - name: "UPDATER | lang | set LANG and LANGUAGE"
@@ -85,5 +131,5 @@
   changed_when: locale_lang != updater_config_system_locale or locale_language != updater_config_system_language
   tags:
     - updater
-    - system_local
+    - system_locale
     - molecule-idempotence-notest

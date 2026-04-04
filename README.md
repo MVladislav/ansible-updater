@@ -44,8 +44,6 @@ updater_ntp_serivce_use_time_synchronization_service: chrony # chrony | systemd-
 updater_ntp_server: time.cloudflare.com
 updater_ntp_fallback_server: ntp.ubuntu.com
 
-updater_language_default_pack: en
-
 updater_config_system_locale: en_US.UTF-8
 updater_config_system_language: en_US.UTF-8
 
@@ -89,7 +87,6 @@ Example how to use:
       updater_ntp_server: time.cloudflare.com
       updater_ntp_fallback_server: ntp.ubuntu.com
       # set default system language
-      updater_language_default_pack: en
       updater_config_system_locale: en_US.UTF-8
       updater_config_system_language: en_US.UTF-8
       # define allowed for unattended to update for
