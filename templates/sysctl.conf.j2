@@ -40,7 +40,9 @@ kernel.kptr_restrict=1
 fs.suid_dumpable=0
 
 # Max inotify instances and watches per user (for applications that require more file monitoring).
+# Backuped optional values: 128 | 8192
 fs.inotify.max_user_instances=8192
+# Backuped optional values: 65536 | 524288
 fs.inotify.max_user_watches=524288
 
 # Restrict ptrace() debugging to parent processes only.
@@ -91,6 +93,16 @@ vm.swappiness=1
 # Adjust these values depending on system load and disk performance requirements.
 #vm.dirty_background_ratio=5
 #vm.dirty_ratio=10
+
+###################################################################
+# ==> Filesystem Parameters
+
+# Increase maximum number of open file descriptors system-wide, supporting applications with many files open.
+# Backuped optional values: 2097152 | 262144 | 4194304 | 9223372036854775807
+fs.file-max=9223372036854775807
+
+# Increase maximum virtual memory map count for applications using large amounts of virtual memory.
+vm.max_map_count=1048576
 
 ###################################################################
 # ==> Networking (Functional Parameters)
@@ -262,16 +274,6 @@ net.core.wmem_max=134217728
 # Define memory pressure thresholds for TCP memory management (low, pressure, high).
 # Backuped optional values: 93222 124299 186444 | 4194304 4194304 4194304 | 8388608 12582912 16777216
 #net.ipv4.tcp_mem=8388608 12582912 16777216
-
-###################################################################
-# ==> Filesystem Parameters
-
-# Increase maximum number of open file descriptors system-wide, supporting applications with many files open.
-# Backuped optional values: 2097152 | 262144 | 4194304 | 9223372036854775807
-fs.file-max=9223372036854775807
-
-# Increase maximum virtual memory map count for applications using large amounts of virtual memory.
-vm.max_map_count=1048576
 
 ###################################################################
 # Notes and Optional Settings

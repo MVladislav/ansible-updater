@@ -26,34 +26,36 @@
     - updater
     - sysctl
 
-- name: "UPDATER | sysctl | create sysctl-resume.service"
+- name: "UPDATER | sysctl | create sysctl-apply.service"
   become: true
   ansible.builtin.copy:
     content: |
       [Unit]
-      Description=Reapply sysctl settings after resume
-      After=suspend.target sleep.target hibernate.target hybrid-sleep.target
+      Description=Reapply sysctl settings
+      After=multi-user.target suspend.target sleep.target hibernate.target hybrid-sleep.target
 
       [Service]
       Type=oneshot
-      ExecStart=/usr/sbin/sysctl -p --system
+      ExecStartPre=/bin/sleep 16
+      ExecStart=/usr/sbin/sysctl --system
 
       [Install]
+      WantedBy=multi-user.target
       WantedBy=suspend.target
       WantedBy=hibernate.target
       WantedBy=hybrid-sleep.target
       WantedBy=sleep.target
-    dest: "/etc/systemd/system/sysctl-resume.service"
+    dest: "/etc/systemd/system/sysctl-apply.service"
     mode: "0644"
   register: sysctl_service_result
   tags:
     - updater
     - sysctl
 
-- name: "UPDATER | sysctl | enable sysctl-resume.service"
+- name: "UPDATER | sysctl | enable sysctl-apply.service"
   become: true
   ansible.builtin.systemd_service:
-    name: sysctl-resume.service
+    name: sysctl-apply.service
     daemon_reload: true
     enabled: true
     masked: false
