@@ -6,7 +6,7 @@
 # To apply changes: `sudo sysctl -p --system`
 #
 
-###################################################################
+################################################################################
 # ==> Kernel Parameters
 
 # Control kernel logging to console (severity levels).
@@ -47,9 +47,13 @@ fs.inotify.max_user_watches=524288
 
 # Restrict ptrace() debugging to parent processes only.
 # Prevents exploitation of ptrace by malicious processes.
-kernel.yama.ptrace_scope=1
+kernel.yama.ptrace_scope=2
 
-###################################################################
+# Reboot after 10 seconds on kernel panic
+#kernel.panic=10
+#kernel.panic_on_oops=1
+
+################################################################################
 # ==> Magic SysRq Key Configuration
 
 # Enable SysRq key functions selectively.
@@ -60,7 +64,7 @@ kernel.yama.ptrace_scope=1
 kernel.sysrq=176
 #kernel.sysrq=438
 
-###################################################################
+################################################################################
 # ==> Virtual Memory
 
 # Prevent null-pointer dereference attacks by restricting minimum address mappable via mmap().
@@ -94,17 +98,17 @@ vm.swappiness=1
 #vm.dirty_background_ratio=5
 #vm.dirty_ratio=10
 
-###################################################################
+################################################################################
 # ==> Filesystem Parameters
 
 # Increase maximum number of open file descriptors system-wide, supporting applications with many files open.
 # Backuped optional values: 2097152 | 262144 | 4194304 | 9223372036854775807
-fs.file-max=9223372036854775807
+fs.file-max=4194304
 
 # Increase maximum virtual memory map count for applications using large amounts of virtual memory.
 vm.max_map_count=1048576
 
-###################################################################
+################################################################################
 # ==> Networking (Functional Parameters)
 
 # Disable IPv6 if not required.
@@ -178,10 +182,6 @@ net.ipv4.tcp_rfc1337=1
 net.ipv6.conf.all.accept_ra=0
 net.ipv6.conf.default.accept_ra=0
 
-# Clear routing cache to ensure routing decisions are made based on up-to-date information.
-net.ipv4.route.flush=1
-net.ipv6.route.flush=1
-
 # Enable TCP Fast Open for faster connections, enhancing performance for both clients and servers.
 # - 0: Disable TCP Fast Open (default if not explicitly set).
 # - 1: Enable TCP Fast Open for outgoing connections (clients).
@@ -200,7 +200,7 @@ net.core.default_qdisc=fq_codel
 
 # Enable TCP window scaling for larger buffers, useful in high-bandwidth or high-latency networks.
 # Increase Linux autotuning TCP buffer limit to 128MB (64MB).
-net.ipv4.tcp_window_scaling=3
+net.ipv4.tcp_window_scaling=1
 
 # Enable MTU Probing (recommended for hosts with jumbo frames enabled).
 #net.ipv4.tcp_mtu_probing=1
@@ -209,15 +209,16 @@ net.ipv4.tcp_window_scaling=3
 net.ipv4.tcp_moderate_rcvbuf=1
 
 # Don't cache the slow start threshold from previous connections for more consistent performance.
-net.ipv4.tcp_no_metrics_save=1
+# NOTE: This can cause inconsistent performance for repeated connections to the same host. Remove unless you have a specific reason.
+#net.ipv4.tcp_no_metrics_save=1
 
 # Enable low-latency TCP connections for time-sensitive applications.
 net.ipv4.tcp_low_latency=1
 
-# Disable netfilter on bridge devices for improved performance in virtualized environments.
-net.bridge.bridge-nf-call-iptables=0
-net.bridge.bridge-nf-call-arptables=0
-net.bridge.bridge-nf-call-ip6tables=0
+# Enable netfilter on bridge devices.
+net.bridge.bridge-nf-call-iptables=1
+net.bridge.bridge-nf-call-arptables=1
+net.bridge.bridge-nf-call-ip6tables=1
 
 # IPv6 Privacy Extensions (RFC 4941)
 # ---
@@ -241,13 +242,13 @@ net.ipv6.conf.default.temp_prefered_lft=3600
 net.ipv6.conf.all.temp_valid_lft=7200
 net.ipv6.conf.default.temp_valid_lft=7200
 
-###################################################################
+################################################################################
 # ==> Networking (Performance Parameters)
 
 # Increase maximum receive/send socket buffer sizes for handling large data streams.
 # Backuped optional values: 212992 | 67108864 | 134217728
-net.core.rmem_max=134217728
-net.core.wmem_max=134217728
+net.core.rmem_max=67108864
+net.core.wmem_max=67108864
 
 # Increase input queue size for better handling of high traffic volumes.
 # Backuped optional values: 1000 | 3000
@@ -258,14 +259,14 @@ net.core.wmem_max=134217728
 #net.core.somaxconn=4096
 
 # Number of flow entries for Receive Packet Steering (RPS).
-# Backuped optional values: 0 | 32768
-#net.core.rps_sock_flow_entries=32768
+# Backuped optional values: 0 | 32768 | 65536
+net.core.rps_sock_flow_entries=65536
 
 # Optimize TCP buffers for high throughput connections (low, pressure, high).
 # Backuped optional values: 4096 131072 6291456 | 4096 87380 67108864 | 4096 87380 134217728
-#net.ipv4.tcp_rmem=4096 87380 134217728
+net.ipv4.tcp_rmem=4096 87380 67108864
 # Backuped optional values: 4096 16384 4194304 | 4096 87380 67108864 | 4096 87380 134217728
-#net.ipv4.tcp_wmem=4096 87380 134217728
+net.ipv4.tcp_wmem=4096 87380 67108864
 
 # Maximum number of queued SYN requests, higher values prevent SYN flood attacks.
 # Backuped optional values: 512 | 4096
@@ -273,43 +274,85 @@ net.core.wmem_max=134217728
 
 # Define memory pressure thresholds for TCP memory management (low, pressure, high).
 # Backuped optional values: 93222 124299 186444 | 4194304 4194304 4194304 | 8388608 12582912 16777216
-#net.ipv4.tcp_mem=8388608 12582912 16777216
+net.ipv4.tcp_mem=8388608 12582912 16777216
 
-###################################################################
+################################################################################
+################################################################################
 # Notes and Optional Settings
+################################################################################
+################################################################################
 
-# ###################################################################
+################################################################################
 # Enabling TCP Timestamps and PMTU Discovery can improve certain network performance metrics
 # but may expose systems to specific types of attacks:
 #net.ipv4.tcp_timestamps=1
 #net.ipv4.ip_no_pmtu_disc=0
 #net.ipv4.tcp_fastopen=1
 
-# ###################################################################
+################################################################################
 # If IPv6 is required, enable it with the following settings
 #net.ipv6.conf.all.disable_ipv6=0
 #net.ipv6.conf.default.disable_ipv6=0
 #net.ipv6.conf.lo.disable_ipv6=0
 
-# ###################################################################
+################################################################################
 # Enable packet forwarding for Docker networking (if installed and required)
 #net.ipv4.ip_forward=1
 #net.ipv4.conf.all.forwarding=1
 #net.ipv6.conf.all.forwarding=1
 
-# ###################################################################
+################################################################################
 # Enable over commit memory, example for valkey (if installed and required)
 #vm.overcommit_memory=1
 
-###################################################################
+################################################################################
 # Optional changes for further performance tuning or alternative configurations:
-###################################################################
+################################################################################
 # Increase the tcp-time-wait buckets pool size to prevent simple DOS attacks
 # Backuped optional values: 262144 | 300000 | 500000 | 1440000
 #net.ipv4.tcp_max_tw_buckets=1440000
 #net.ipv4.tcp_tw_reuse=1
+# Increase IP fragmentation thresholds (for high-throughput networks)
 ## to be tested
 #net.ipv4.ipfrag_high_thresh=8388608
 #net.ipv4.ipfrag_low_thresh=196608
 #net.ipv6.ip6frag_high_thresh=8388608
 #net.ipv6.ip6frag_low_thresh=196608
+
+################################################################################
+# EXAMPLE 1 :: enable changes when needed
+################################################################################
+#net.ipv4.tcp_timestamps=1
+#net.ipv4.ip_no_pmtu_disc=0
+#net.ipv4.tcp_fastopen=3
+#vm.overcommit_memory=1
+
+################################################################################
+# EXAMPLE 2 :: Increase SYN backlog and socket queue for high traffic
+################################################################################
+#net.core.somaxconn=65535
+#net.ipv4.tcp_max_syn_backlog=4096
+
+################################################################################
+# EXAMPLE 3 :: Wireguard server specific config tweaks
+################################################################################
+#net.ipv4.ip_forward=1
+#net.ipv4.conf.all.forwarding=1
+#net.ipv4.conf.default.forwarding=1
+# Use loose or strict RPF for security (recommended for WireGuard)
+#net.ipv4.conf.all.rp_filter=1
+#net.ipv4.conf.default.rp_filter=1
+# Increase UDP buffer sizes (WireGuard uses UDP)
+#net.core.rmem_default=67108864
+#net.core.wmem_default=67108864
+
+################################################################################
+# EXAMPLE 4 :: Disable bridge netfilter for Proxmox/Docker (MANDATORY for performance)
+################################################################################
+#net.bridge.bridge-nf-call-iptables=0
+#net.bridge.bridge-nf-call-arptables=0
+#net.bridge.bridge-nf-call-ip6tables=0
+# Increase conntrack for Docker networking
+#net.netfilter.nf_conntrack_max=524288
+#net.netfilter.nf_conntrack_buckets=65536
+#net.netfilter.nf_conntrack_tcp_timeout_time_wait=30

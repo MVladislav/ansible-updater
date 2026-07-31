@@ -21,6 +21,7 @@ updater_config:
   setup_zfs: false
   setup_unattended: true
   setup_sysctl: true
+  setup_sysctl_systemd: false
 
 # ------------------------------------------------------------------------------
 updater_time_timezone: Europe/Berlin

@@ -48,6 +48,9 @@
     dest: "/etc/systemd/system/sysctl-apply.service"
     mode: "0644"
   register: sysctl_service_result
+  when:
+    - updater_config.setup_sysctl_systemd is defined
+    - updater_config.setup_sysctl_systemd | bool
   tags:
     - updater
     - sysctl
