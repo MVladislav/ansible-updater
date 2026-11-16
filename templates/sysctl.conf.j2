@@ -195,8 +195,8 @@ net.ipv4.tcp_congestion_control=bbr
 #net.ipv4.tcp_congestion_control=cubic
 
 # Default queuing discipline (reduces latency under load).
-net.core.default_qdisc=fq_codel
-#net.core.default_qdisc=fq
+#net.core.default_qdisc=fq_codel
+net.core.default_qdisc=fq
 
 # Enable TCP window scaling for larger buffers, useful in high-bandwidth or high-latency networks.
 # Increase Linux autotuning TCP buffer limit to 128MB (64MB).
@@ -212,8 +212,8 @@ net.ipv4.tcp_moderate_rcvbuf=1
 # NOTE: This can cause inconsistent performance for repeated connections to the same host. Remove unless you have a specific reason.
 #net.ipv4.tcp_no_metrics_save=1
 
-# Enable low-latency TCP connections for time-sensitive applications.
-net.ipv4.tcp_low_latency=1
+# (TODO REMOVE)Enable low-latency TCP connections for time-sensitive applications.
+#net.ipv4.tcp_low_latency=1
 
 # Enable netfilter on bridge devices.
 net.bridge.bridge-nf-call-iptables=1
@@ -264,9 +264,9 @@ net.core.rps_sock_flow_entries=65536
 
 # Optimize TCP buffers for high throughput connections (low, pressure, high).
 # Backuped optional values: 4096 131072 6291456 | 4096 87380 67108864 | 4096 87380 134217728
-net.ipv4.tcp_rmem=4096 87380 67108864
+net.ipv4.tcp_rmem=4096 87380 4194304
 # Backuped optional values: 4096 16384 4194304 | 4096 87380 67108864 | 4096 87380 134217728
-net.ipv4.tcp_wmem=4096 87380 67108864
+net.ipv4.tcp_wmem=4096 87380 4194304
 
 # Maximum number of queued SYN requests, higher values prevent SYN flood attacks.
 # Backuped optional values: 512 | 4096

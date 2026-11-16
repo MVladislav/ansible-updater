@@ -13,9 +13,9 @@
     - updater
     - sysctl
 
-- name: "UPDATER | sysctl | init tunning's step:: run 'sysctl -p --system'"
+- name: "UPDATER | sysctl | init tunning's step:: run 'sysctl --system'"
   become: true
-  ansible.builtin.command: sysctl -p --system
+  ansible.builtin.command: sysctl --system
   changed_when: tunning_network_result.changed | default(false) | bool
   when:
     - tunning_network_result is defined
