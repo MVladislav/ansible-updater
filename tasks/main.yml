@@ -87,10 +87,17 @@
 # ------------------------------------------------------------------------------
 # SETUP ZFS
 - name: "UPDATER | zfs | setup zfs"
-  ansible.builtin.include_tasks: setup_zfs.yml
+  ansible.builtin.include_tasks: setup_storage_zfs.yml
   when:
     - updater_config.setup_zfs is defined
     - updater_config.setup_zfs | bool
+
+# SETUP LVM
+- name: "UPDATER | lvm | setup lvm"
+  ansible.builtin.include_tasks: setup_storage_lvm.yml
+  when:
+    - updater_config.setup_lvm is defined
+    - updater_config.setup_lvm | bool
 
 # ------------------------------------------------------------------------------
 # SETUP UNATTENDED-UPGRADES

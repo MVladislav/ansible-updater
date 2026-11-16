@@ -19,6 +19,7 @@ updater_config:
   set_language: true
   update_upgrade: true
   setup_zfs: false
+  setup_lvm: false
   setup_unattended: true
   setup_sysctl: true
   setup_sysctl_systemd: false

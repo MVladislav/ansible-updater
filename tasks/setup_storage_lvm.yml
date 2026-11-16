@@ -1,0 +1,58 @@
+---
+# tasks file for ./roles/updater
+
+- name: "UPDATER | lvm | Check logical volume device"
+  become: true
+  ansible.builtin.stat:
+    path: /dev/mapper/ubuntu--vg-ubuntu--lv
+  register: updater_lvm_lv_device
+  tags:
+    - updater
+    - lvm
+
+# - name: "UPDATER | lvm | Discover physical volumes"
+#   become: true
+#   ansible.builtin.command:
+#     argv:
+#       - pvs
+#       - --noheadings
+#       - --options
+#       - pv_name
+#       - --select
+#       - vg_name=ubuntu-vg
+#   register: updater_lvm_pvs
+#   changed_when: false
+#   when: updater_lvm_lv_device.stat.exists
+#   tags:
+#     - updater
+#     - lvm
+
+# - name: "UPDATER | lvm | Resize physical volumes"
+#   become: true
+#   community.general.lvm_pv:
+#     device: "{{ item | trim }}"
+#     resize: true
+#   loop: "{{ updater_lvm_pvs.stdout_lines | default([]) }}"
+#   when:
+#     - updater_lvm_lv_device.stat.exists
+#     - updater_lvm_pv_device is defined
+#     - updater_lvm_pvs.stdout_lines | default([]) | length > 0
+#   tags:
+#     - updater
+#     - lvm
+
+- name: "UPDATER | lvm | Extend logical volume and filesystem"
+  become: true
+  community.general.lvol:
+    vg: ubuntu-vg
+    lv: ubuntu-lv
+    size: +100%FREE
+    shrink: false
+    resizefs: true
+    state: present
+  when:
+    - updater_lvm_lv_device.stat is defined
+    - updater_lvm_lv_device.stat.exists
+  tags:
+    - updater
+    - lvm
