@@ -38,7 +38,7 @@ rtcsync
 
 # Step the system clock instead of slewing it if the adjustment is larger than
 # one second, but only in the first three clock updates.
-makestep 1 3
+makestep 1 -1
 
 # Get TAI-UTC offset and leap seconds from the system tz database.
 # This directive must be commented out when using time sources serving
@@ -63,4 +63,4 @@ dumpdir /var/lib/chrony
 logchange 0.5
 
 # Allow for up to 1 second difference between the local clock and the NTP servers
-maxdistance 1
+maxdistance 3
