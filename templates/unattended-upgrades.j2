@@ -72,6 +72,10 @@ Unattended-Upgrade::MailOnlyOnError "{{ updater_unattended_mail_only_on_error | 
 // (equivalent to apt-get autoremove)
 Unattended-Upgrade::Remove-Unused-Dependencies "{{ updater_unattended_remove_unused_dependencies | lower }}";
 
+// Do automatic removal of all unused kernel packages after the upgrade
+// (kernel images, kernel headers and kernel version locked tools).
+Unattended-Upgrade::Remove-Unused-Kernel-Packages "{{ updater_unattended_remove_unused_kernel_packages | lower }}";
+
 // Do automatic removal of new unused dependencies after the upgrade
 Unattended-Upgrade::Remove-New-Unused-Dependencies "{{ updater_unattended_remove_new_unused_dependencies | lower }}";
 

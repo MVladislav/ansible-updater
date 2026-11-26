@@ -105,6 +105,10 @@ updater_unattended_mail_only_on_error: false
 # (equivalent to apt-get autoremove)
 updater_unattended_remove_unused_dependencies: true
 
+# -> Unattended-Upgrade::Remove-Unused-Kernel-Packages
+# Do automatic removal of all unused kernel packages after the upgrade
+updater_unattended_remove_unused_kernel_packages: true
+
 # -> Unattended-Upgrade::Remove-New-Unused-Dependencies
 # Remove any new unused dependencies after the upgrade
 updater_unattended_remove_new_unused_dependencies: true
